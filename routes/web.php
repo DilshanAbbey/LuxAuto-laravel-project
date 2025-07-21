@@ -9,7 +9,7 @@ Route::get('/', function () {
 
 // Login/Register page (only if you're using a custom one)
 Route::get('/loginregister', function () {
-    return view('auth.loginregister');
+    return view('loginregister');
 });
 
 // Shop page
@@ -19,7 +19,7 @@ Route::get('/shop', function () {
 
 // Dashboard page
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return view('auth.dashboard');
 });
 
 // Abput Us page
@@ -27,8 +27,11 @@ Route::get('/aboutus', function () {
     return view('aboutus');
 });
 
-// Abput Us page
+// Contact Us page
 Route::get('/contactus', function () {
     return view('contactus');
 });
 
+use App\Http\Controllers\CustomerController;
+
+Route::resource('customers', CustomerController::class);

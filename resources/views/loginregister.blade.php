@@ -250,22 +250,22 @@
           </button>
           <div class="hidden lg:flex" id="navbar-nav">
             <ul class="flex space-x-1">
-              <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="brandnewcommerce.html"><span>Home</span></a></li>
-              <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="#"><span>About Us</span></a></li>
-              <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="brandnewcommerce_shop.html"><span>Shop</span></a></li>
-              <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="#"><span>Contact Us</span></a></li>
-              <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5 bg-blue-500 text-white" href="#"><span>Login</span></a></li>
+              <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="/"><span>Home</span></a></li>
+              <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="/aboutus"><span>About Us</span></a></li>
+              <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="/shop"><span>Shop</span></a></li>
+              <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="/contactus"><span>Contact Us</span></a></li>
+              <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5 bg-blue-500 text-white" href="/loginregister"><span>Login</span></a></li>
             </ul>
           </div>
         </div>
         <!-- Mobile menu -->
         <div class="lg:hidden hidden mt-4" id="mobile-menu">
           <ul class="flex flex-col space-y-2">
-            <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="brandnewcommerce.html"><span>Home</span></a></li>
-            <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="#"><span>About Us</span></a></li>
-            <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="brandnewcommerce_shop.html"><span>Shop</span></a></li>
-            <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="#"><span>Contact Us</span></a></li>
-            <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5 bg-blue-500 text-white" href="#"><span>Login</span></a></li>
+            <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="/"><span>Home</span></a></li>
+            <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="/aboutus"><span>About Us</span></a></li>
+            <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="/shop"><span>Shop</span></a></li>
+            <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5" href="/contactus"><span>Contact Us</span></a></li>
+            <li><a class="navbar-nav nav-link nav-link-hover block px-6 py-2 text-center min-w-max rounded transition-all duration-300 mx-0.5 bg-blue-500 text-white" href="/loginregister"><span>Login</span></a></li>
           </ul>
         </div>
       </div>

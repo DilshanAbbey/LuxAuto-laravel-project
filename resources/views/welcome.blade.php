@@ -97,6 +97,24 @@
       overflow: hidden;
     }
 
+        /* Add this for the overlay */
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+        z-index: 1;
+    }
+
+    /* Put your content above the overlay */
+    .hero > * {
+        position: relative;
+        z-index: 2;
+    }
+
     .hero-overlay {
       position: absolute;
       top: 15%;
@@ -405,7 +423,7 @@
 
           <!-- Desktop navigation -->
           <ul class="desktop-nav flex space-x-1">
-            <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block active" href="/"><span>Home</span></a></li>
+            <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block active bg-accent-blue text-white" href="/"><span>Home</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/aboutus"><span>About Us</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/shop"><span>Shop</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/contactus"><span>Contact Us</span></a></li>
@@ -416,8 +434,8 @@
         <!-- Mobile navigation -->
         <div class="mobile-menu mt-4">
           <ul class="flex flex-col space-y-2">
-            <li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="/"><span>Home</span></a></li>
-            <li><a class="nav-link-hover px-6 py-2 rounded text-center block bg-accent-blue text-white" href="/aboutus"><span>About Us</span></a></li>
+            <li><a class="nav-link-hover px-6 py-2 rounded text-center block bg-accent-blue text-white" href="/"><span>Home</span></a></li>
+            <li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="/aboutus"><span>About Us</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="/shop"><span>Shop</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="/contactus"><span>Contact Us</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="/loginregister"><span>Login</span></a></li>

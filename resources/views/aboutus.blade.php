@@ -34,6 +34,24 @@
       min-height: 100vh;
     }
 
+    /* Add this for the overlay */
+    .main-content::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+        z-index: 1;
+    }
+
+    /* Put your content above the overlay */
+    .main-content > * {
+        position: relative;
+        z-index: 2;
+    }
+
     .nav-link-hover {
       position: relative;
       overflow: hidden;
@@ -141,8 +159,8 @@
 
           <!-- Desktop navigation -->
           <ul class="desktop-nav flex space-x-1">
-            <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/l"><span>Home</span></a></li>
-            <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block active" href="/aboutus"><span>About Us</span></a></li>
+            <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/"><span>Home</span></a></li>
+            <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block active bg-accent-blue text-white" href="/aboutus"><span>About Us</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/shop"><span>Shop</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/contactus"><span>Contact Us</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/loginregister"><span>Login</span></a></li>

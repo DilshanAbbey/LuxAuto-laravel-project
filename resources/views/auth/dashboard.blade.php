@@ -1,48 +1,3 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="p-6 space-y-6">
-  <h1 class="text-3xl font-bold">Dashboard</h1>
-
-  @if(Auth::user()->role === 'admin')
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white p-4 rounded shadow">Customers: {{ $totalCustomers }}</div>
-      <div class="bg-white p-4 rounded shadow">Employees: {{ $totalEmployees }}</div>
-      <div class="bg-white p-4 rounded shadow">Products: {{ $totalProducts }}</div>
-      <div class="bg-white p-4 rounded shadow">Sales: ${{ $totalSales }}</div>
-    </div>
-
-  @elseif(Auth::user()->role === 'employee')
-    <div class="bg-white p-4 rounded shadow">
-      <h2 class="text-xl font-semibold mb-2">Product List</h2>
-      <a href="{{ route('products.index') }}" class="text-blue-500 underline">Manage Products</a>
-    </div>
-
-  @elseif(Auth::user()->role === 'technician')
-    <div class="space-y-4">
-      <div class="bg-white p-4 rounded shadow">
-        <h2 class="text-lg font-semibold">Assigned Jobs</h2>
-        <ul class="list-disc ml-6">
-          @foreach($assignedJobs as $job)
-            <li>{{ $job->description }}</li>
-          @endforeach
-        </ul>
-      </div>
-
-      <div class="bg-white p-4 rounded shadow">
-        <h2 class="text-lg font-semibold">Completed Jobs</h2>
-        <ul class="list-disc ml-6">
-          @foreach($completedJobs as $job)
-            <li>{{ $job->description }}</li>
-          @endforeach
-        </ul>
-      </div>
-    </div>
-  @endif
-</div>
-@endsection
-
-
 
 
 <!DOCTYPE html>
@@ -79,9 +34,27 @@
     }
     
     .dashboard-overlay {
-	  background: url('stretch-image5.png') center/cover;
+	  background: url('images/stretch-image5.png') center/cover;
       min-height: 100vh;
     }
+
+	/* Add this for the overlay */
+	.dashboard-overlay::before {
+		content: "";
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		background-color: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+		z-index: 1;
+	}
+
+	/* Put your content above the overlay */
+	.dashboard-overlay > * {
+		position: relative;
+		z-index: 2;
+	}
 	
 	.nav-link-hover {
       position: relative;
@@ -222,7 +195,7 @@
 		<nav class="bg-white shadow-lg p-3">
 		  <div class="max-w-7xl mx-auto">
 			<div class="flex justify-between items-center">
-			  <a class="text-accent-blue font-bold text-xl" href="brandnewcommerce.html">LuxAuto</a>
+			  <a class="text-accent-blue font-bold text-xl" href="#">LuxAuto</a>
 			  
 			  <!-- Mobile menu button -->
 			  <button class="mobile-menu-button md:hidden text-gray-500 hover:text-gray-700 focus:outline-none" onclick="toggleMobileMenu()">
@@ -233,14 +206,14 @@
 
 			  <!-- Desktop navigation -->
 			  <ul class="desktop-nav flex space-x-1">
-				<li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="brandnewcommerce_loginregister.html"><span>Logout</span></a></li>
+				<li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/loginregister"><span>Logout</span></a></li>
 			  </ul>
 			</div>
 
 			<!-- Mobile navigation -->
 			<div class="mobile-menu mt-4">
 			  <ul class="flex flex-col space-y-2">
-				<li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="brandnewcommerce_loginregister.html"><span>Logout</span></a></li>
+				<li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="/loginregister"><span>Logout</span></a></li>
 			  </ul>
 			</div>
 		  </div>
@@ -293,7 +266,7 @@
 		  <button onclick="showTab('customerDeliveryTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Customer Delivery Management</button>
 		  <button onclick="showTab('customerVehicleTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Customer Vehicle Management</button>
 		  <button onclick="showTab('vehicleRepairTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Vehicle Repair Management</button>
-		  <button onclick="showTab('vehicleServiceTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Vehicle Booking Management</button>
+		  <button onclick="showTab('vehicleServiceTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Vehicle Service Management</button>
 		  <button onclick="showTab('customerChatTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Customer Chat Management</button>
 		  <button onclick="showTab('employeeTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Employee Management</button>
 		  <button onclick="showTab('productTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Product Management</button>
@@ -305,8 +278,18 @@
 		  <h2 class="text-2xl font-bold text-blue-600 mb-4">Customer Management</h2>
 		  <button onclick="openModal('customer')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Customer</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">ID</th><th class="px-4 py-2">Name</th><th class="px-4 py-2">Email</th><th class="px-4 py-2">Phone</th><th class="px-4 py-2">Action</th></tr></thead>
-			<tbody class="divide-y divide-gray-200" id="customerTable"></tbody>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">ID</th>
+					<th class="px-4 py-2">Name</th>
+					<th class="px-4 py-2">Email</th>
+					<th class="px-4 py-2">Phone</th>
+					<th class="px-4 py-2">Username</th>
+					<th class="px-4 py-2">Password</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
+			<tbody class="divide-y divide-gray-200" id="customerDeliveryTable"></tbody>
 		  </table>
 		</div>
 		
@@ -402,13 +385,27 @@
 		  </div>
 		</div>
 	  </div>
+	</div>
+  </div>
 
 
 	  <script>
 		let activeTab = 'customer';
+		let formContext = 'customer';
 		let editTargetRow = null;
 		let editMode = false;
-		const tabIds = ['customerTab', 'employeeTab', 'productTab', 'jobTab'];
+		const tabIds = [
+		  'customerTab',
+		  'customerDeliveryTab',
+		  'customerVehicleTab',
+		  'vehicleRepairTab',
+		  'vehicleServiceTab',
+		  'customerChatTab',
+		  'employeeTab',
+		  'productTab',
+		  'jobTab'
+		];
+		
 		const fields = {
 		  customer: ['Customer Name', 'Email', 'Phone'],
 		  customer_delivery: ['Customer Name', 'Address', 'City', 'Zip Code'],
@@ -427,11 +424,13 @@
 		  tabIds.forEach(tab => document.getElementById(tab).classList.remove('active'));
 		  document.getElementById(id).classList.add('active');
 		  activeTab = id.replace('Tab', '');
+		  formContext = activeTab; // <-- set form context when switching tab
 		}
 
 		function openModal(context) {
 		  editTargetRow = null;
 		  editMode = false;
+		  formContext = context;
 		  generateForm(fields[context]);
 		  document.getElementById('modalTitle').innerText = `Add ${capitalize(context)}`;
 		  document.getElementById('formModal').classList.add('active');
@@ -469,8 +468,10 @@
 			const row = tableBody.insertRow();
 			row.innerHTML = `<td>${tableBody.rows.length + 1}</td>` +
 			  data.map(d => `<td>${d}</td>`).join('') +
-			  `<td><button onclick="editRow(this, '${activeTab}')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-			   <button onclick="deleteRow(this)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button></td>`;
+			  `<td>
+				<button onclick="editRow(this, '${formContext}')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+				<button onclick="deleteRow(this)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+			  </td>`;
 		  }
 
 		  closeModal();
