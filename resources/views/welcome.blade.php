@@ -599,6 +599,7 @@
         </div>
       </div>
       <div class="chat-input-area">
+        <textarea class="chat-input" id="chatCustomerId" placeholder="Enter your Customer Id..." rows="1"></textarea>
         <textarea class="chat-input" id="chatInput" placeholder="Describe your mechanical issue..." rows="2"></textarea>
         <button class="send-btn" onclick="sendMessage()">Send Message</button>
       </div>
@@ -629,6 +630,7 @@
 
     function sendMessage() {
       const input = document.getElementById('chatInput');
+      const customerIdInput = document.getElementById('chatCustomerId');
       const messages = document.getElementById('chatMessages');
       const message = input.value.trim();
       
@@ -644,12 +646,13 @@
         
         // Clear input
         input.value = '';
+        customerIdInput.value = '';
         
         // Simulate technician response
         setTimeout(() => {
           const techDiv = document.createElement('div');
           techDiv.className = 'bg-gray-200 p-3 rounded-lg mb-3';
-          techDiv.innerHTML = `<strong>Technician Mike:</strong> Thanks for your message! I'll analyze your issue and get back to you with specific part recommendations and troubleshooting steps. Can you provide your vehicle's make, model, and year?`;
+          techDiv.innerHTML = `<strong>Technician Mike:</strong> Thanks for your message! I'll analyze your issue and get back to you with specific solutions and recommendations.`;
           messages.appendChild(techDiv);
           messages.scrollTop = messages.scrollHeight;
         }, 1500);
@@ -658,6 +661,13 @@
 
     // Allow Enter key to send message
     document.getElementById('chatInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    document.getElementById('chatCustomerId').addEventListener('keypress', function(e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendMessage();
