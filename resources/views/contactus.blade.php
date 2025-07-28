@@ -6,6 +6,7 @@
   <title>LuxParts - Contact Us</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  @vite('resources/css/app.css')
   <script>
     tailwind.config = {
       theme: {
@@ -113,6 +114,19 @@
 
     .contact-info {
       animation: fadeInUp 0.8s ease;
+    }
+
+    .btn-contact {
+      background-color: #007bff; /* Default blue */
+      border: none;
+      border-radius: 1rem;
+      padding: 1rem 2rem;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
 
     .btn-contact::before {

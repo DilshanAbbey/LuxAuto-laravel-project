@@ -6,6 +6,7 @@
   <title>LuxAuto - Login & Registration</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  @vite('resources/css/app.css')
   <script>
     tailwind.config = {
       theme: {
@@ -98,6 +99,25 @@
       z-index: 1;
     }
 
+    .auth-tab {
+      flex: 1;
+      padding: 1.25rem;
+      text-align: center;
+      color: white;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background-color: #007bff; /* Light blue default */
+      font-weight: normal;
+      transition: background-color 0.3s ease;
+      z-index: 2;
+    }
+
+    .auth-tab.active {
+      background-color: #0056b3; /* Darker blue when active */
+      font-weight: bold;
+    }
+
     .auth-tab::before {
       content: '';
       position: absolute;
@@ -105,12 +125,18 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: rgba(255, 255, 255, 0.1);
       transition: left 0.3s ease;
+      z-index: 1;
     }
 
     .auth-tab:hover::before {
       left: 0;
+    }
+
+    .auth-tab span,
+    .auth-tab i {
+      position: relative;
+      z-index: 2;
     }
 
     @keyframes fadeInUp {
@@ -132,10 +158,19 @@
 		display: block;
 	  }
 	  
-	.auth-tab.active {
-		background-color: rgba(255, 255, 255, 0.4);
-		font-weight: bold;
-	  }
+
+  .btn-auth {
+    background-color: #007bff; /* Default blue */
+    border: none;
+    border-radius: 1rem;
+    padding: 1rem 2rem;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
 
     .btn-auth::before {
       content: '';
@@ -277,7 +312,7 @@
     <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
     <div class="relative z-20 bg-white bg-opacity-95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden w-full max-w-4xl mx-5">
       <div class="flex bg-gradient-to-br from-accent to-blue-700">
-        <div class="auth-tab flex-1 p-5 text-center text-white cursor-pointer transition-all duration-300 relative overflow-hidden bg-white bg-opacity-20 font-bold" data-tab="login">
+        <div class="auth-tab flex-1 p-5 text-center text-white cursor-pointer transition-all duration-300 relative overflow-hidden font-bold" data-tab="login">
           <i class="fas fa-sign-in-alt mr-2 text-lg"></i>
           <span>Login</span>
         </div>
