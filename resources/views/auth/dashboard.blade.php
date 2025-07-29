@@ -276,7 +276,7 @@
 		</div>
 
 		<!-- Customer Management Tab -->
-		<div id="customerTab" class="tab-content bg-white p-6 rounded shadow active">
+		<div id="customerTab" class="tab-content bg-white xp-6 rounded shadow active">
 		  <h2 class="text-2xl font-bold text-blue-600 mb-4">Customer Management</h2>
 		  <button onclick="openModal('customer')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Customer</button>
 		  <table class="min-w-full divide-y divide-gray-200">
@@ -287,6 +287,7 @@
 					<th class="px-4 py-2">Email</th>
 					<th class="px-4 py-2">Phone</th>
 					<th class="px-4 py-2">Username</th>
+					<th class="px-4 py-2">Password</th>
 					<th class="px-4 py-2">Action</th>
 				</tr>
 			</thead>
@@ -294,11 +295,12 @@
 				@if(isset($data['customers']) && count($data['customers']) > 0)
 				@foreach($data['customers'] as $customer)
 				<tr data-id="{{ $customer->id }}">
-					<td class="px-4 py-2">{{ $customer->id }}</td>
-					<td class="px-4 py-2">{{ $customer->name }}</td>
+					<td class="px-4 py-2">{{ $customer->idCustomer }}</td>
+					<td class="px-4 py-2">{{ $customer->customerName }}</td>
 					<td class="px-4 py-2">{{ $customer->email }}</td>
-					<td class="px-4 py-2">{{ $customer->phone }}</td>
+					<td class="px-4 py-2">{{ $customer->contactNumber }}</td>
 					<td class="px-4 py-2">{{ $customer->username }}</td>
+					<td class="px-4 py-2">{{ $customer->password }}</td>
 					<td class="px-4 py-2">
 					<button onclick="editRow(this, 'customer')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 					<button onclick="deleteRow(this, 'customer')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
@@ -319,12 +321,21 @@
 		  <h2 class="text-2xl font-bold text-blue-600 mb-4">Customer Delivery Management</h2>
 		  <button onclick="openModal('customer_delivery')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Customer Delivery Info</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">ID</th><th class="px-4 py-2">Customer Name</th><th class="px-4 py-2">Address</th><th class="px-4 py-2">City</th><th class="px-4 py-2">Zip Code</th><th class="px-4 py-2">Action</th></tr></thead>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">ID</th>
+					<th class="px-4 py-2">Customer ID</th>
+					<th class="px-4 py-2">Address</th>
+					<th class="px-4 py-2">City</th>
+					<th class="px-4 py-2">Zip Code</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
 			<tbody class="divide-y divide-gray-200" id="customerDeliveryTable">
 				@foreach($data['customerDeliveries'] as $delivery)
 				<tr data-id="{{ $delivery->id }}">
 					<td class="px-4 py-2">{{ $delivery->id }}</td>
-					<td class="px-4 py-2">{{ $delivery->customer->name }}</td>
+					<td class="px-4 py-2">{{ $delivery->customer->id }}</td>
 					<td class="px-4 py-2">{{ $delivery->address }}</td>
 					<td class="px-4 py-2">{{ $delivery->city }}</td>
 					<td class="px-4 py-2">{{ $delivery->zip_code }}</td>
@@ -343,12 +354,24 @@
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Vehicle Management</h2>
 		  <button onclick="openModal('customer_vehicle')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Customer Vehicle</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">Vehicle ID</th><th class="px-4 py-2">Customer Name</th><th class="px-4 py-2">Vehicle Number</th><th class="px-4 py-2">Vehicle Brand</th><th class="px-4 py-2">Model</th><th class="px-4 py-2">Trim/Edition</th><th class="px-4 py-2">Modal Year</th><th class="px-4 py-2">Description</th><th class="px-4 py-2">Action</th></tr></thead>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">Vehicle ID</th>
+					<th class="px-4 py-2">Customer ID</th>
+					<th class="px-4 py-2">Vehicle Number</th>
+					<th class="px-4 py-2">Vehicle Brand</th>
+					<th class="px-4 py-2">Model</th>
+					<th class="px-4 py-2">Trim/Edition</th>
+					<th class="px-4 py-2">Modal Year</th>
+					<th class="px-4 py-2">Description</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
 			<tbody class="divide-y divide-gray-200" id="customerVehicleTable">
 				@foreach($data['customerVehicles'] as $vehicle)
 				<tr data-id="{{ $vehicle->id }}">
 					<td class="px-4 py-2">{{ $vehicle->id }}</td>
-					<td class="px-4 py-2">{{ $vehicle->customer->name }}</td>
+					<td class="px-4 py-2">{{ $vehicle->customer->id }}</td>
 					<td class="px-4 py-2">{{ $vehicle->vehicle_number }}</td>
 					<td class="px-4 py-2">{{ $vehicle->vehicle_brand }}</td>
 					<td class="px-4 py-2">{{ $vehicle->model }}</td>
@@ -370,12 +393,23 @@
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Vehicle Repair Management</h2>
 		  <button onclick="openModal('Vehicle_Repairs')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Vehicle Repair History</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">ID</th><th class="px-4 py-2">Customer Name</th><th class="px-4 py-2">Vehicle Number</th><th class="px-4 py-2">Date of Repair</th><th class="px-4 py-2">Description</th><th class="px-4 py-2">Price</th><th class="px-4 py-2">Technician In-Charge</th><th class="px-4 py-2">Action</th></tr></thead>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">ID</th>
+					<th class="px-4 py-2">Customer ID</th>
+					<th class="px-4 py-2">Vehicle Number</th>
+					<th class="px-4 py-2">Date of Repair</th>
+					<th class="px-4 py-2">Description</th>
+					<th class="px-4 py-2">Price</th>
+					<th class="px-4 py-2">Technician In-Charge</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
 			<tbody class="divide-y divide-gray-200" id="vehicleRepairTable">
 				@foreach($data['vehicleRepairs'] as $repair)
 				<tr data-id="{{ $repair->id }}">
 					<td class="px-4 py-2">{{ $repair->id }}</td>
-					<td class="px-4 py-2">{{ $repair->customer->name }}</td>
+					<td class="px-4 py-2">{{ $repair->customer->id }}</td>
 					<td class="px-4 py-2">{{ $repair->vehicle_number }}</td>
 					<td class="px-4 py-2">{{ $repair->repair_date->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $repair->description }}</td>
@@ -396,12 +430,23 @@
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Repair Booking Management</h2>
 		  <button onclick="openModal('Repair_Booking')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Repair Booking</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">ID</th><th class="px-4 py-2">Customer Name</th><th class="px-4 py-2">Vehicle Number</th><th class="px-4 py-2">Date of Repair</th><th class="px-4 py-2">Description</th><th class="px-4 py-2">Price</th><th class="px-4 py-2">Technician In-Charge</th><th class="px-4 py-2">Action</th></tr></thead>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">ID</th>
+					<th class="px-4 py-2">Customer ID</th>
+					<th class="px-4 py-2">Slot Number</th>
+					<th class="px-4 py-2">date</th>
+					<th class="px-4 py-2">time</th>
+					<th class="px-4 py-2">Description</th>
+					<th class="px-4 py-2">Technician In-Charge</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
 			<tbody class="divide-y divide-gray-200" id="repairBookingTable">
 				@foreach($data['vehicleRepairs'] as $repairBooking)
 				<tr data-id="{{ $repair->id }}">
 					<td class="px-4 py-2">{{ $repair->id }}</td>
-					<td class="px-4 py-2">{{ $repair->customer->name }}</td>
+					<td class="px-4 py-2">{{ $repair->customer->id }}</td>
 					<td class="px-4 py-2">{{ $repair->vehicle_number }}</td>
 					<td class="px-4 py-2">{{ $repair->repair_date->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $repair->description }}</td>
@@ -422,7 +467,18 @@
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Vehicle Service Management</h2>
 		  <button onclick="openModal('Vehicle_Service')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Vehicle Service History</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">Job ID</th><th class="px-4 py-2">Customer Name</th><th class="px-4 py-2">Vehicle Number</th><th class="px-4 py-2">Date of Service</th><th class="px-4 py-2">Description</th><th class="px-4 py-2">Price</th><th class="px-4 py-2">Technician In-Charge</th><th class="px-4 py-2">Action</th></tr></thead>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">Job ID</th>
+					<th class="px-4 py-2">Customer Name</th>
+					<th class="px-4 py-2">Vehicle Number</th>
+					<th class="px-4 py-2">Date of Service</th>
+					<th class="px-4 py-2">Description</th>
+					<th class="px-4 py-2">Price</th>
+					<th class="px-4 py-2">Technician In-Charge</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
 			<tbody class="divide-y divide-gray-200" id="vehicleServiceTable">
 				@foreach($data['vehicleServices'] as $service)
 				<tr data-id="{{ $service->id }}">
@@ -448,7 +504,18 @@
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Service Booking Management</h2>
 		  <button onclick="openModal('Service_Booking')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Service Booking</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">Job ID</th><th class="px-4 py-2">Customer Name</th><th class="px-4 py-2">Vehicle Number</th><th class="px-4 py-2">Date of Service</th><th class="px-4 py-2">Description</th><th class="px-4 py-2">Price</th><th class="px-4 py-2">Technician In-Charge</th><th class="px-4 py-2">Action</th></tr></thead>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">Job ID</th>
+					<th class="px-4 py-2">Customer Name</th>
+					<th class="px-4 py-2">Vehicle Number</th>
+					<th class="px-4 py-2">Date of Service</th>
+					<th class="px-4 py-2">Description</th>
+					<th class="px-4 py-2">Price</th>
+					<th class="px-4 py-2">Technician In-Charge</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
 			<tbody class="divide-y divide-gray-200" id="serviceBookingTable">
 				@foreach($data['vehicleServices'] as $serviceBooking)
 				<tr data-id="{{ $service->id }}">
@@ -474,7 +541,18 @@
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Chat Management</h2>
 		  <button onclick="openModal('Customer_Chat')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Customer Chat</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">ID</th><th class="px-4 py-2">Customer Name</th><th class="px-4 py-2">Employee Name</th><th class="px-4 py-2">Date</th><th class="px-4 py-2">Description</th><th class="px-4 py-2">Technician In-Charge</th><th class="px-4 py-2">Status</th><th class="px-4 py-2">Action</th></tr></thead>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">ID</th>
+					<th class="px-4 py-2">Customer Name</th>
+					<th class="px-4 py-2">Employee Name</th>
+					<th class="px-4 py-2">Date</th>
+					<th class="px-4 py-2">Description</th>
+					<th class="px-4 py-2">Technician In-Charge</th>
+					<th class="px-4 py-2">Status</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
 			<tbody class="divide-y divide-gray-200" id="customerChatTable">
 				@foreach($data['customerChats'] as $chat)
 				<tr data-id="{{ $chat->id }}">
@@ -500,17 +578,32 @@
 		  <h2 class="text-2xl font-bold text-green-600 mb-4">Employee Management</h2>
 		  <button onclick="openModal('employee')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Employee</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">ID</th><th class="px-4 py-2">Name</th><th class="px-4 py-2">NIC</th><th class="px-4 py-2">Email</th><th class="px-4 py-2">Contact</th><th class="px-4 py-2">Role</th><th class="px-4 py-2">Salary</th><th class="px-4 py-2">Action</th></tr></thead>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">ID</th>
+					<th class="px-4 py-2">Name</th>
+					<th class="px-4 py-2">NIC</th>
+					<th class="px-4 py-2">Email</th>
+					<th class="px-4 py-2">Contact</th>
+					<th class="px-4 py-2">Role</th>
+					<th class="px-4 py-2">Salary</th>
+					<th class="px-4 py-2">Username</th>
+					<th class="px-4 py-2">Password</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
 			<tbody class="divide-y divide-gray-200" id="employeeTable">
 				@foreach($data['employees'] as $employee)
 				<tr data-id="{{ $employee->id }}">
 					<td class="px-4 py-2">{{ $employee->id }}</td>
-					<td class="px-4 py-2">{{ $employee->name }}</td>  
+					<td class="px-4 py-2">{{ $employee->name }}</td>
 					<td class="px-4 py-2">{{ $employee->nic }}</td>
 					<td class="px-4 py-2">{{ $employee->email }}</td>
 					<td class="px-4 py-2">{{ $employee->contact }}</td>
 					<td class="px-4 py-2">{{ $employee->role }}</td>
 					<td class="px-4 py-2">${{ $employee->salary }}</td>
+					<td class="px-4 py-2">${{ $employee->username }}</td>
+					<td class="px-4 py-2">${{ $employee->password }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'employee')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 						<button onclick="deleteRow(this, 'employee')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
@@ -526,7 +619,19 @@
 		  <h2 class="text-2xl font-bold text-cyan-600 mb-4">Product Management</h2>
 		   <button onclick="openModal('product')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Product</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">Part ID</th><th class="px-4 py-2">Part Name</th><th class="px-4 py-2">Part Number</th><th class="px-4 py-2">Brand</th><th class="px-4 py-2">Model</th><th class="px-4 py-2">Price</th><th class="px-4 py-2">Description</th><th class="px-4 py-2">Quantity in Stock</th><th class="px-4 py-2">Action</th></tr></thead>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">Part ID</th>
+					<th class="px-4 py-2">Part Name</th>
+					<th class="px-4 py-2">Part Number</th>
+					<th class="px-4 py-2">Brand</th>
+					<th class="px-4 py-2">Model</th>
+					<th class="px-4 py-2">Price</th>
+					<th class="px-4 py-2">Description</th>
+					<th class="px-4 py-2">Quantity in Stock</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
 			<tbody class="divide-y divide-gray-200" id="productTable">
 				@foreach($data['parts'] as $product)
 				<tr data-id="{{ $product->id }}">
@@ -553,7 +658,18 @@
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Job Management</h2>
 		  <button onclick="openModal('job')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Job</button>
 		  <table class="min-w-full divide-y divide-gray-200">
-			<thead><tr class="bg-gray-100 text-left text-gray-600"><th class="px-4 py-2">Job ID</th><th class="px-4 py-2">Type</th><th class="px-4 py-2">Customer Name</th><th class="px-4 py-2">Date of Schedule</th><th class="px-4 py-2">Description</th><th class="px-4 py-2">Price</th><th class="px-4 py-2">Technician In-Charge</th><th class="px-4 py-2">Action</th></tr></thead>
+			<thead>
+				<tr class="bg-gray-100 text-left text-gray-600">
+					<th class="px-4 py-2">Job ID</th>
+					<th class="px-4 py-2">Type</th>
+					<th class="px-4 py-2">Customer Name</th>
+					<th class="px-4 py-2">Date of Schedule</th>
+					<th class="px-4 py-2">Description</th>
+					<th class="px-4 py-2">Price</th>
+					<th class="px-4 py-2">Technician In-Charge</th>
+					<th class="px-4 py-2">Action</th>
+				</tr>
+			</thead>
 			<tbody class="divide-y divide-gray-200" id="jobTable">
 				@foreach($data['jobs'] as $job)
 				<tr data-id="{{ $job->id }}">
@@ -615,7 +731,7 @@
 		];
 		
 		const fields = {
-		customer: ['Customer Name', 'Email', 'Phone'],
+		customer: ['Customer Name', 'Email', 'Phone', 'Username', 'Password'],
 		customer_delivery: ['Customer Name', 'Address', 'City', 'Zip Code'],
 		customer_vehicle: ['Customer Name', 'Vehicle Number', 'Vehicle Brand', 'Vehicle Model', 'Trim/Edition', 'Modal Year', 'Description'],
 		Vehicle_Repairs: ['Customer Name', 'Vehicle Number', 'Repair Date', 'Description', 'Price', 'Technician In-Charge'],
@@ -623,7 +739,7 @@
 		Repair_Booking: ['Customer Name', 'Vehicle Number', 'Slot Number', 'Date', 'Time', 'Technician In-Charge'],
 		Service_Booking: ['Customer Name', 'Vehicle Number', 'Slot Number', 'Date', 'Time', 'Technician In-Charge'],
 		Customer_Chat: ['Customer Name', 'Employee Name', 'Date', 'Description', 'Technician In-Charge', 'Status'],
-		employee: ['Employee Name', 'NIC', 'Email', 'Contact', 'Role', 'Salary'],
+		employee: ['Employee Name', 'NIC', 'Email', 'Contact', 'Role', 'Salary', 'Username', 'Password'],
 		product: ['Part Name', 'Part Number', 'Brand', 'Model', 'Price', 'Description', 'Stock'],
 		job: ['Type', 'Customer', 'Date', 'Description', 'Price', 'Technician']
 		};
