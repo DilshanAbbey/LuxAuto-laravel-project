@@ -45,9 +45,11 @@ class DashboardController extends Controller
             Log::info('Customer store request:', $request->all());
             
             $request->validate([
-                'Customer_Name' => 'required|string|max:255',
-                'Email' => 'required|email|unique:customers,email',
-                'Phone' => 'required|string|max:20',
+                'customerName' => 'required|string|max:255',
+                'email' => 'required|email|unique:customers',
+                'contactNumber' => 'required|string',
+                'username' => 'required|string|unique:customers',
+                'password' => 'required|string|min:6'
             ]);
 
             $customer = Customer::create([
@@ -75,9 +77,11 @@ class DashboardController extends Controller
             $customer = Customer::findOrFail($id);
             
             $request->validate([
-                'Customer_Name' => 'required|string|max:255',
-                'Email' => 'required|email|unique:customers,email,' . $id,
-                'Phone' => 'required|string|max:20',
+                'customerName' => 'required|string|max:255',
+                'email' => 'required|email|unique:customers',
+                'contactNumber' => 'required|string',
+                'username' => 'required|string|unique:customers',
+                'password' => 'required|string|min:6'
             ]);
 
             $customer->update([

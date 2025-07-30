@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id('idCustomer_Chat');
             $table->string('date');
             $table->string('description');
-            $table->string('technician');
             $table->string('status');
             $table->string('customer_id');
             $table->string('employee_id');

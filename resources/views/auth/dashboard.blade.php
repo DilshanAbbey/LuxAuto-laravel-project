@@ -323,7 +323,6 @@
 		  <table class="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr class="bg-gray-100 text-left text-gray-600">
-					<th class="px-4 py-2">ID</th>
 					<th class="px-4 py-2">Customer ID</th>
 					<th class="px-4 py-2">Address</th>
 					<th class="px-4 py-2">City</th>
@@ -334,8 +333,7 @@
 			<tbody class="divide-y divide-gray-200" id="customerDeliveryTable">
 				@foreach($data['customerDeliveries'] as $delivery)
 				<tr data-id="{{ $delivery->id }}">
-					<td class="px-4 py-2">{{ $delivery->id }}</td>
-					<td class="px-4 py-2">{{ $delivery->customer->id }}</td>
+					<td class="px-4 py-2">{{ $delivery->customer->idCustomer }}</td>
 					<td class="px-4 py-2">{{ $delivery->address }}</td>
 					<td class="px-4 py-2">{{ $delivery->city }}</td>
 					<td class="px-4 py-2">{{ $delivery->zip_code }}</td>
@@ -370,13 +368,13 @@
 			<tbody class="divide-y divide-gray-200" id="customerVehicleTable">
 				@foreach($data['customerVehicles'] as $vehicle)
 				<tr data-id="{{ $vehicle->id }}">
-					<td class="px-4 py-2">{{ $vehicle->id }}</td>
-					<td class="px-4 py-2">{{ $vehicle->customer->id }}</td>
-					<td class="px-4 py-2">{{ $vehicle->vehicle_number }}</td>
-					<td class="px-4 py-2">{{ $vehicle->vehicle_brand }}</td>
+					<td class="px-4 py-2">{{ $vehicle->idCustomer_Vehicle }}</td>
+					<td class="px-4 py-2">{{ $vehicle->customer->idCustomer }}</td>
+					<td class="px-4 py-2">{{ $vehicle->vehicleNumber }}</td>
+					<td class="px-4 py-2">{{ $vehicle->vehicleBrand }}</td>
 					<td class="px-4 py-2">{{ $vehicle->model }}</td>
-					<td class="px-4 py-2">{{ $vehicle->trim_edition }}</td>
-					<td class="px-4 py-2">{{ $vehicle->modal_year }}</td>
+					<td class="px-4 py-2">{{ $vehicle->trim/edition }}</td>
+					<td class="px-4 py-2">{{ $vehicle->modalYear }}</td>
 					<td class="px-4 py-2">{{ $vehicle->description }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'customer_vehicle')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
@@ -408,13 +406,13 @@
 			<tbody class="divide-y divide-gray-200" id="vehicleRepairTable">
 				@foreach($data['vehicleRepairs'] as $repair)
 				<tr data-id="{{ $repair->id }}">
-					<td class="px-4 py-2">{{ $repair->id }}</td>
-					<td class="px-4 py-2">{{ $repair->customer->id }}</td>
-					<td class="px-4 py-2">{{ $repair->vehicle_number }}</td>
-					<td class="px-4 py-2">{{ $repair->repair_date->format('Y-m-d') }}</td>
+					<td class="px-4 py-2">{{ $repair->idVehicle_Repair }}</td>
+					<td class="px-4 py-2">{{ $repair->customer->idCustomer }}</td>
+					<td class="px-4 py-2">{{ $repair->vehicle->vehicleNumber }}</td>
+					<td class="px-4 py-2">{{ $repair->repairDate->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $repair->description }}</td>
 					<td class="px-4 py-2">${{ $repair->price }}</td>
-					<td class="px-4 py-2">{{ $repair->technician_in_charge }}</td>
+					<td class="px-4 py-2">{{ $repair->technician }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'Vehicle_Repairs')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 						<button onclick="deleteRow(this, 'Vehicle_Repairs')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
@@ -433,25 +431,21 @@
 			<thead>
 				<tr class="bg-gray-100 text-left text-gray-600">
 					<th class="px-4 py-2">ID</th>
-					<th class="px-4 py-2">Customer ID</th>
 					<th class="px-4 py-2">Slot Number</th>
+					<th class="px-4 py-2">Customer ID</th>
 					<th class="px-4 py-2">date</th>
-					<th class="px-4 py-2">time</th>
-					<th class="px-4 py-2">Description</th>
 					<th class="px-4 py-2">Technician In-Charge</th>
 					<th class="px-4 py-2">Action</th>
 				</tr>
 			</thead>
 			<tbody class="divide-y divide-gray-200" id="repairBookingTable">
-				@foreach($data['vehicleRepairs'] as $repairBooking)
-				<tr data-id="{{ $repair->id }}">
-					<td class="px-4 py-2">{{ $repair->id }}</td>
-					<td class="px-4 py-2">{{ $repair->customer->id }}</td>
-					<td class="px-4 py-2">{{ $repair->vehicle_number }}</td>
-					<td class="px-4 py-2">{{ $repair->repair_date->format('Y-m-d') }}</td>
-					<td class="px-4 py-2">{{ $repair->description }}</td>
-					<td class="px-4 py-2">${{ $repair->price }}</td>
-					<td class="px-4 py-2">{{ $repair->technician_in_charge }}</td>
+				@foreach($data['repairBooking'] as $repairBook)
+				<tr data-id="{{ $repairBook->id }}">
+					<td class="px-4 py-2">{{ $repairBook->idRepair_booking }}</td>
+					<td class="px-4 py-2">{{ $repairBook->slotNumber }}</td>
+					<td class="px-4 py-2">{{ $repairBook->customer->idCustomer }}</td>
+					<td class="px-4 py-2">{{ $repairBook->date->format('Y-m-d') }}</td>
+					<td class="px-4 py-2">{{ $repairBook->technician_in_charge }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'Repair_Booking')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 						<button onclick="deleteRow(this, 'Repair_booking')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
@@ -469,7 +463,7 @@
 		  <table class="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr class="bg-gray-100 text-left text-gray-600">
-					<th class="px-4 py-2">Job ID</th>
+					<th class="px-4 py-2">ID</th>
 					<th class="px-4 py-2">Customer Name</th>
 					<th class="px-4 py-2">Vehicle Number</th>
 					<th class="px-4 py-2">Date of Service</th>
@@ -482,13 +476,13 @@
 			<tbody class="divide-y divide-gray-200" id="vehicleServiceTable">
 				@foreach($data['vehicleServices'] as $service)
 				<tr data-id="{{ $service->id }}">
-					<td class="px-4 py-2">{{ $service->id }}</td>
-					<td class="px-4 py-2">{{ $service->customer->name }}</td>
-					<td class="px-4 py-2">{{ $service->vehicle_number }}</td>
-					<td class="px-4 py-2">{{ $service->service_date->format('Y-m-d') }}</td>
+					<td class="px-4 py-2">{{ $service->idVehicle_Service }}</td>
+					<td class="px-4 py-2">{{ $service->customer->idCustomer }}</td>
+					<td class="px-4 py-2">{{ $service->vehicle->vehicleNumber }}</td>
+					<td class="px-4 py-2">{{ $service->serviceDate->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $service->description }}</td>
 					<td class="px-4 py-2">${{ $service->price }}</td>
-					<td class="px-4 py-2">{{ $service->technician_in_charge }}</td>
+					<td class="px-4 py-2">{{ $service->technician }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'Vehicle_Service')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 						<button onclick="deleteRow(this, 'Vehicle_Service')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
@@ -506,26 +500,22 @@
 		  <table class="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr class="bg-gray-100 text-left text-gray-600">
-					<th class="px-4 py-2">Job ID</th>
+					<th class="px-4 py-2">ID</th>
+					<th class="px-4 py-2">Slot Number</th>
 					<th class="px-4 py-2">Customer Name</th>
-					<th class="px-4 py-2">Vehicle Number</th>
-					<th class="px-4 py-2">Date of Service</th>
-					<th class="px-4 py-2">Description</th>
-					<th class="px-4 py-2">Price</th>
+					<th class="px-4 py-2">Date of Service</th>>
 					<th class="px-4 py-2">Technician In-Charge</th>
 					<th class="px-4 py-2">Action</th>
 				</tr>
 			</thead>
 			<tbody class="divide-y divide-gray-200" id="serviceBookingTable">
-				@foreach($data['vehicleServices'] as $serviceBooking)
-				<tr data-id="{{ $service->id }}">
-					<td class="px-4 py-2">{{ $service->id }}</td>
-					<td class="px-4 py-2">{{ $service->customer->name }}</td>
-					<td class="px-4 py-2">{{ $service->vehicle_number }}</td>
-					<td class="px-4 py-2">{{ $service->service_date->format('Y-m-d') }}</td>
-					<td class="px-4 py-2">{{ $service->description }}</td>
-					<td class="px-4 py-2">${{ $service->price }}</td>
-					<td class="px-4 py-2">{{ $service->technician_in_charge }}</td>
+				@foreach($data['serviceBooking'] as $serviceBook)
+				<tr data-id="{{ $serviceBook->id }}">
+					<td class="px-4 py-2">{{ $serviceBook->idService_booking }}</td>
+					<td class="px-4 py-2">{{ $serviceBook->slotNumber }}</td>
+					<td class="px-4 py-2">{{ $serviceBook->customer->idCustomer }}</td>
+					<td class="px-4 py-2">{{ $serviceBook->date->format('Y-m-d') }}</td>
+					<td class="px-4 py-2">{{ $serviceBook->technician }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'Vehicle_Service')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 						<button onclick="deleteRow(this, 'Vehicle_Service')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
@@ -556,12 +546,11 @@
 			<tbody class="divide-y divide-gray-200" id="customerChatTable">
 				@foreach($data['customerChats'] as $chat)
 				<tr data-id="{{ $chat->id }}">
-					<td class="px-4 py-2">{{ $chat->id }}</td>
-					<td class="px-4 py-2">{{ $chat->customer->name }}</td>
-					<td class="px-4 py-2">{{ $chat->employee_name }}</td>
+					<td class="px-4 py-2">{{ $chat->idCustomer_Chat }}</td>
+					<td class="px-4 py-2">{{ $chat->customer->idCustomer }}</td>
+					<td class="px-4 py-2">{{ $chat->employee->employeeName }}</td>
 					<td class="px-4 py-2">{{ $chat->date->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $chat->description }}</td>
-					<td class="px-4 py-2">{{ $chat->technician_in_charge }}</td>
 					<td class="px-4 py-2">{{ $chat->status }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'Customer_Chat')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
@@ -595,11 +584,11 @@
 			<tbody class="divide-y divide-gray-200" id="employeeTable">
 				@foreach($data['employees'] as $employee)
 				<tr data-id="{{ $employee->id }}">
-					<td class="px-4 py-2">{{ $employee->id }}</td>
-					<td class="px-4 py-2">{{ $employee->name }}</td>
+					<td class="px-4 py-2">{{ $employee->idEmployee }}</td>
+					<td class="px-4 py-2">{{ $employee->employeeName }}</td>
 					<td class="px-4 py-2">{{ $employee->nic }}</td>
 					<td class="px-4 py-2">{{ $employee->email }}</td>
-					<td class="px-4 py-2">{{ $employee->contact }}</td>
+					<td class="px-4 py-2">{{ $employee->contactNumber }}</td>
 					<td class="px-4 py-2">{{ $employee->role }}</td>
 					<td class="px-4 py-2">${{ $employee->salary }}</td>
 					<td class="px-4 py-2">${{ $employee->username }}</td>
@@ -635,14 +624,14 @@
 			<tbody class="divide-y divide-gray-200" id="productTable">
 				@foreach($data['parts'] as $product)
 				<tr data-id="{{ $product->id }}">
-					<td class="px-4 py-2">{{ $product->id }}</td>
-					<td class="px-4 py-2">{{ $product->part_name }}</td>
-					<td class="px-4 py-2">{{ $product->part_number }}</td>
+					<td class="px-4 py-2">{{ $product->idPart }}</td>
+					<td class="px-4 py-2">{{ $product->partName }}</td>
+					<td class="px-4 py-2">{{ $product->partNumber }}</td>
 					<td class="px-4 py-2">{{ $product->brand }}</td>
 					<td class="px-4 py-2">{{ $product->model }}</td>
 					<td class="px-4 py-2">${{ $product->price }}</td>
 					<td class="px-4 py-2">{{ $product->description }}</td>
-					<td class="px-4 py-2">{{ $product->stock }}</td>
+					<td class="px-4 py-2">{{ $product->quantityInStock }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'product')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 						<button onclick="deleteRow(this, 'product')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
@@ -744,6 +733,27 @@
 		job: ['Type', 'Customer', 'Date', 'Description', 'Price', 'Technician']
 		};
 
+		const fieldMapping = {
+			customer: {
+				'Customer_Name': 'customerName',
+				'Email': 'email',
+				'Contact_Number': 'contactNumber',
+				'Username': 'username', 
+				'Password': 'password'
+			},
+			employee: {
+				'Name': 'name',
+				'NIC': 'nic',
+				'Email': 'email',
+				'Contact': 'contact',
+				'Role': 'role',
+				'Salary': 'salary',
+				'Username': 'username',
+				'Password': 'password'
+			}
+			// Add mappings for other entities as needed
+		};
+
 		const apiEndpoints = {
 		customer: '/dashboard/customers',
 		customer_delivery: '/dashboard/customer-deliveries',
@@ -827,10 +837,17 @@
 		const form = document.getElementById('dynamicForm');
 		const formData = new FormData(form);
 		
-		// Convert FormData to regular object
+		// Convert FormData to regular object with proper field mapping
 		const data = {};
 		for (let [key, value] of formData.entries()) {
-			data[key] = value;
+			// Apply field mapping if it exists for this context
+			if (fieldMapping[formContext] && fieldMapping[formContext][key]) {
+				data[fieldMapping[formContext][key]] = value;
+			} else {
+				// Convert field name to snake_case for database compatibility
+				const dbFieldName = key.toLowerCase().replace(/\s+/g, '_');
+				data[dbFieldName] = value;
+			}
 		}
 
 		console.log('Form Data:', data);

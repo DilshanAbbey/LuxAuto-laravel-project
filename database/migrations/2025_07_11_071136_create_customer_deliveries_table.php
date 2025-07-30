@@ -15,9 +15,6 @@ return new class extends Migration
             $table->string('address');
             $table->string('city');
             $table->integer('zip_code');
-            $table->string('technician');
-            $table->string('vehicle_id');
-            $table->id('customer_id');
             $table->timestamps();
         });
     }

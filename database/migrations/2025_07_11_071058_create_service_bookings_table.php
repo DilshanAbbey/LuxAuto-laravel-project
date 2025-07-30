@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id('idService_booking');
             $table->string('slotNumber');
             $table->string('date');
-            $table->string('time');
             $table->string('technician');
             $table->string('vehicle_id');
             $table->string('customer_id');
