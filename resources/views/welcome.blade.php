@@ -425,7 +425,7 @@
 
           <!-- Desktop navigation -->
           <ul class="desktop-nav flex space-x-1">
-            <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block active bg-accent-blue text-white" href="/"><span>Home</span></a></li>
+            <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block active bg-accent-blue text-white" href="/"><span>Dashboard</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/aboutus"><span>About Us</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/shop"><span>Shop</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/contactus"><span>Contact Us</span></a></li>
@@ -436,7 +436,7 @@
         <!-- Mobile navigation -->
         <div class="mobile-menu mt-4">
           <ul class="flex flex-col space-y-2">
-            <li><a class="nav-link-hover px-6 py-2 rounded text-center block bg-accent-blue text-white" href="/"><span>Home</span></a></li>
+            <li><a class="nav-link-hover px-6 py-2 rounded text-center block bg-accent-blue text-white" href="/"><span>Dashboard</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="/aboutus"><span>About Us</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="/shop"><span>Shop</span></a></li>
             <li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="/contactus"><span>Contact Us</span></a></li>
