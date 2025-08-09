@@ -5,17 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CustomerChat extends Model
+class ServiceBooking extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'idCustomer_Chat',
+        'idService_booking',
         'customer_id',
-        'employee_id',
+        'vehicle_id',
+        'slotNumber',
         'date',
-        'description',
-        'status'
+        'time',
+        'technician'
     ];
 
     protected $casts = [
@@ -27,8 +28,13 @@ class CustomerChat extends Model
         return $this->belongsTo(Customer::class, 'customer_id');
     }
 
+    public function vehicle()
+    {
+        return $this->belongsTo(CustomerVehicle::class, 'vehicle_id');
+    }
+
     public function employee()
     {
-        return $this->belongsTo(Employee::class, 'employee_id');
+        return $this->belongsTo(employee::class, 'employee_id');
     }
 }

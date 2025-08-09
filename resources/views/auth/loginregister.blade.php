@@ -324,11 +324,11 @@
 
       <div class="p-10">
         <!-- Login Form -->
-        <form class="auth-form block" id="loginForm">
+        <form class="auth-form block" id="loginForm" method="POST" action="{{ route('login') }}">
           <h2 class="text-center mb-6 text-blue-500 text-2xl font-semibold">Welcome Back!</h2>
           
           <div class="relative mb-6">
-            <input type="email" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="loginEmail" placeholder="Email Address" required>
+            <input type="email" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="loginEmail" placeholder="Email Address" value="{{ old('email') }}" required>
             <i class="fas fa-envelope absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-all duration-300"></i>
             <div class="validation-message text-sm mt-1 transition-all duration-300" id="loginEmailMsg"></div>
           </div>
@@ -348,7 +348,7 @@
           </div>
 
           <button type="submit" class="btn-auth w-full bg-gradient-to-br from-accent to-blue-700 border-none rounded-xl py-4 px-8 text-white font-bold text-base transition-all duration-300 relative overflow-hidden hover:transform hover:-translate-y-0.5" id="loginBtn">
-            <span>Sign In</span>
+            <span>Log in</span>
           </button>
 
           <div class="divider text-center my-5 relative">
@@ -363,20 +363,20 @@
         </form>
 
         <!-- Register Form -->
-        <form class="auth-form hidden" id="registerForm">
+        <form class="auth-form hidden" id="registerForm" method="POST" action="{{ route('register') }}">
           <h2 class="text-center mb-6 text-blue-500 text-2xl font-semibold">Create Account</h2>
           
           <div class="flex flex-wrap -mx-2">
             <div class="w-full md:w-1/2 px-2">
               <div class="relative mb-6">
-                <input type="text" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="firstName" placeholder="First Name" required>
+                <input type="text" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="firstName" placeholder="First Name" value="{{ old('first_name') }}" required>
                 <i class="fas fa-user absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-all duration-300"></i>
                 <div class="validation-message text-sm mt-1 transition-all duration-300" id="firstNameMsg"></div>
               </div>
             </div>
             <div class="w-full md:w-1/2 px-2">
               <div class="relative mb-6">
-                <input type="text" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="lastName" placeholder="Last Name" required>
+                <input type="text" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="lastName" placeholder="Last Name" value="{{ old('last_name') }}" required>
                 <i class="fas fa-user absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-all duration-300"></i>
                 <div class="validation-message text-sm mt-1 transition-all duration-300" id="lastNameMsg"></div>
               </div>
@@ -384,20 +384,20 @@
           </div>
 
           <div class="relative mb-6">
-            <input type="email" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="registerEmail" placeholder="Email Address" required>
+            <input type="email" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="registerEmail" placeholder="Email Address" value="{{ old('email') }}" required>
             <i class="fas fa-envelope absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-all duration-300"></i>
             <div class="validation-message text-sm mt-1 transition-all duration-300" id="registerEmailMsg"></div>
           </div>
 
           <div class="relative mb-6">
-            <input type="tel" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="phone" placeholder="Phone Number" required>
+            <input type="tel" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="phone" placeholder="Phone Number" value="{{ old('phone') }}" required>
             <i class="fas fa-phone absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-all duration-300"></i>
             <div class="validation-message text-sm mt-1 transition-all duration-300" id="phoneMsg"></div>
           </div>
 
           <div class="w-full md:w-1/2 px-2">
             <div class="relative mb-6">
-              <input type="text" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="userName" placeholder="User Name" required>
+              <input type="text" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="userName" placeholder="User Name" value="{{ old('username') }}" required>
               <i class="fas fa-user absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-all duration-300"></i>
               <div class="validation-message text-sm mt-1 transition-all duration-300" id="usernameMsg"></div>
             </div>

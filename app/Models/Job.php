@@ -10,11 +10,15 @@ class Job extends Model
     use HasFactory;
 
     protected $fillable = [
-        'type', 'customer', 'date', 'description', 'price', 'technician'
+        'type',
+        'customer',
+        'date',
+        'description',
+        'price',
+        'technician'
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'price' => 'decimal:2'
+        'date' => 'date'
     ];
 }

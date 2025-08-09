@@ -16,6 +16,16 @@ class CustomerVehicle extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function repairs()
+    {
+        return $this->hasMany(VehicleRepair::class, 'vehicle_id');
+    }
+
+    public function services()
+    {
+        return $this->hasMany(VehicleService::class, 'vehicle_id');
     }
 }

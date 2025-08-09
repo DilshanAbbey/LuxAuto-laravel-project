@@ -17,4 +17,9 @@ class Part extends Model
     protected $casts = [
         'price' => 'decimal:2'
     ];
+
+    public function cartItems()
+    {
+        return $this->hasMany(Cart::class, 'part_id');
+    }
 }

@@ -16,4 +16,9 @@ class Employee extends Model
     protected $casts = [
         'salary' => 'decimal:2'
     ];
+
+    public function chats()
+    {
+        return $this->hasMany(CustomerChat::class, 'employee_id');
+    }
 }

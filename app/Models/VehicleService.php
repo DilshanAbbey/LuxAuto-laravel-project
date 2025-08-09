@@ -22,6 +22,16 @@ class VehicleService extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(CustomerVehicle::class, 'vehicle_id');
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(employee::class, 'employee_id');
     }
 }

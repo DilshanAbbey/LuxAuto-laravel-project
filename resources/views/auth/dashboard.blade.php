@@ -447,8 +447,8 @@
 					<td class="px-4 py-2">{{ $repairBook->date->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $repairBook->technician_in_charge }}</td>
 					<td class="px-4 py-2">
-						<button onclick="editRow(this, 'Repair_Booking')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-						<button onclick="deleteRow(this, 'Repair_booking')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+						<button onclick="editRow(this, 'repair_booking')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+    					<button onclick="deleteRow(this, 'repair_booking')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
 					</td>
 				</tr>
 				@endforeach
@@ -513,12 +513,12 @@
 				<tr data-id="{{ $serviceBook->id }}">
 					<td class="px-4 py-2">{{ $serviceBook->idService_booking }}</td>
 					<td class="px-4 py-2">{{ $serviceBook->slotNumber }}</td>
-					<td class="px-4 py-2">{{ $serviceBook->customer->idCustomer }}</td>
-					<td class="px-4 py-2">{{ $serviceBook->date->format('Y-m-d') }}</td>
+					<td class="px-4 py-2">{{ $serviceBook->customer->idCustomer ?? 'N/A' }}</td>
+					<td class="px-4 py-2">{{ $serviceBook->date ? $serviceBook->date->format('Y-m-d') : 'N/A' }}</td>
 					<td class="px-4 py-2">{{ $serviceBook->technician }}</td>
 					<td class="px-4 py-2">
-						<button onclick="editRow(this, 'Vehicle_Service')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-						<button onclick="deleteRow(this, 'Vehicle_Service')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+						<button onclick="editRow(this, 'service_booking')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+           				<button onclick="deleteRow(this, 'service_booking')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
 					</td>
 				</tr>
 				@endforeach
@@ -535,7 +535,6 @@
 				<tr class="bg-gray-100 text-left text-gray-600">
 					<th class="px-4 py-2">ID</th>
 					<th class="px-4 py-2">Customer Name</th>
-					<th class="px-4 py-2">Employee Name</th>
 					<th class="px-4 py-2">Date</th>
 					<th class="px-4 py-2">Description</th>
 					<th class="px-4 py-2">Technician In-Charge</th>
@@ -548,9 +547,9 @@
 				<tr data-id="{{ $chat->id }}">
 					<td class="px-4 py-2">{{ $chat->idCustomer_Chat }}</td>
 					<td class="px-4 py-2">{{ $chat->customer->idCustomer }}</td>
-					<td class="px-4 py-2">{{ $chat->employee->employeeName }}</td>
 					<td class="px-4 py-2">{{ $chat->date->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $chat->description }}</td>
+					<td class="px-4 py-2">{{ $chat->employee->employeeName }}</td>
 					<td class="px-4 py-2">{{ $chat->status }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'Customer_Chat')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
@@ -591,8 +590,8 @@
 					<td class="px-4 py-2">{{ $employee->contactNumber }}</td>
 					<td class="px-4 py-2">{{ $employee->role }}</td>
 					<td class="px-4 py-2">${{ $employee->salary }}</td>
-					<td class="px-4 py-2">${{ $employee->username }}</td>
-					<td class="px-4 py-2">${{ $employee->password }}</td>
+					<td class="px-4 py-2">{{ $employee->username }}</td>
+					<td class="px-4 py-2">{{ $employee->password }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'employee')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 						<button onclick="deleteRow(this, 'employee')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
@@ -694,7 +693,7 @@
 	</div>
   </div>
 
-  <script>
+  	<script>
 		// CSRF Token Setup
 		const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 		console.log('CSRF Token:', csrfToken);
@@ -706,31 +705,31 @@
 		let editId = null;
 
 		const tabIds = [
-		'customerTab',
-		'customerDeliveryTab', 
-		'customerVehicleTab',
-		'vehicleRepairTab',
-		'vehicleServiceTab',
-		'repairBookingTab',
-		'serviceBookingTab',
-		'customerChatTab',
-		'employeeTab',
-		'productTab',
-		'jobTab'
+			'customerTab',
+			'customerDeliveryTab', 
+			'customerVehicleTab',
+			'vehicleRepairTab',
+			'vehicleServiceTab',
+			'repairBookingTab',
+			'serviceBookingTab',
+			'customerChatTab',
+			'employeeTab',
+			'productTab',
+			'jobTab'
 		];
 		
 		const fields = {
-		customer: ['Customer Name', 'Email', 'Phone', 'Username', 'Password'],
-		customer_delivery: ['Customer Name', 'Address', 'City', 'Zip Code'],
-		customer_vehicle: ['Customer Name', 'Vehicle Number', 'Vehicle Brand', 'Vehicle Model', 'Trim/Edition', 'Modal Year', 'Description'],
-		Vehicle_Repairs: ['Customer Name', 'Vehicle Number', 'Repair Date', 'Description', 'Price', 'Technician In-Charge'],
-		Vehicle_Service: ['Customer Name', 'Vehicle Number', 'Service Date', 'Description', 'Price', 'Next Service Date', 'Technician In-Charge'],
-		Repair_Booking: ['Customer Name', 'Vehicle Number', 'Slot Number', 'Date', 'Time', 'Technician In-Charge'],
-		Service_Booking: ['Customer Name', 'Vehicle Number', 'Slot Number', 'Date', 'Time', 'Technician In-Charge'],
-		Customer_Chat: ['Customer Name', 'Employee Name', 'Date', 'Description', 'Technician In-Charge', 'Status'],
-		employee: ['Employee Name', 'NIC', 'Email', 'Contact', 'Role', 'Salary', 'Username', 'Password'],
-		product: ['Part Name', 'Part Number', 'Brand', 'Model', 'Price', 'Description', 'Stock'],
-		job: ['Type', 'Customer', 'Date', 'Description', 'Price', 'Technician']
+			customer: ['Customer Name', 'Email', 'Contact Number', 'Username', 'Password'],
+			customer_delivery: ['Customer ID', 'Address', 'City', 'Zip Code'],
+			customer_vehicle: ['Customer ID', 'Vehicle Number', 'Vehicle Brand', 'Vehicle Model', 'Trim Edition', 'Modal Year', 'Description'],
+			vehicle_repair: ['Customer ID', 'Vehicle ID', 'Repair Date', 'Description', 'Price', 'Technician'],
+			vehicle_service: ['Customer ID', 'Vehicle ID', 'Service Date', 'Description', 'Price', 'Next Service Date', 'Technician'],
+			repair_booking: ['Customer ID', 'Vehicle ID', 'Slot Number', 'Date', 'Time', 'Technician In Charge'],
+			service_booking: ['Customer ID', 'Vehicle ID', 'Slot Number', 'Date', 'Time', 'Technician'],
+			customer_chat: ['Customer ID', 'Employee ID', 'Date', 'Description', 'Status'],
+			employee: ['Employee Name', 'NIC', 'Email', 'Contact Number', 'Role', 'Salary', 'Username', 'Password'],
+			part: ['Part Name', 'Part Number', 'Brand', 'Model', 'Price', 'Description', 'Quantity In Stock'],
+			job: ['Type', 'Customer', 'Date', 'Description', 'Price', 'Technician']
 		};
 
 		const fieldMapping = {
@@ -742,339 +741,387 @@
 				'Password': 'password'
 			},
 			employee: {
-				'Name': 'name',
+				'Employee_Name': 'employeeName',
 				'NIC': 'nic',
 				'Email': 'email',
-				'Contact': 'contact',
+				'Contact_Number': 'contactNumber',
 				'Role': 'role',
 				'Salary': 'salary',
 				'Username': 'username',
 				'Password': 'password'
+			},
+			part: {
+				'Part_Name': 'partName',
+				'Part_Number': 'partNumber',
+				'Brand': 'brand',
+				'Model': 'model',
+				'Price': 'price',
+				'Description': 'description',
+				'Quantity_In_Stock': 'quantityInStock'
+			},
+			customer_delivery: {
+				'Customer_ID': 'customer_id',
+				'Address': 'address',
+				'City': 'city',
+				'Zip_Code': 'zip_code'
+			},
+			customer_vehicle: {
+				'Customer_ID': 'customer_id',
+				'Vehicle_Number': 'vehicleNumber',
+				'Vehicle_Brand': 'vehicleBrand',
+				'Vehicle_Model': 'model',
+				'Trim_Edition': 'trim_edition',
+				'Modal_Year': 'modalYear',
+				'Description': 'description'
+			},
+			vehicle_repair: {
+				'Customer_ID': 'customer_id',
+				'Vehicle_ID': 'vehicle_id',
+				'Repair_Date': 'repairDate',
+				'Description': 'description',
+				'Price': 'price',
+				'Technician': 'technician'
+			},
+			vehicle_service: {
+				'Customer_ID': 'customer_id',
+				'Vehicle_ID': 'vehicle_id',
+				'Service_Date': 'serviceDate',
+				'Description': 'description',
+				'Price': 'price',
+				'Next_Service_Date': 'nextServiceDate',
+				'Technician': 'technician'
+			},
+			repair_booking: {
+				'Customer_ID': 'customer_id',
+				'Vehicle_ID': 'vehicle_id',
+				'Slot_Number': 'slotNumber',
+				'Date': 'date',
+				'Time': 'time',
+				'Technician_In_Charge': 'technician_in_charge'
+			},
+			service_booking: {
+				'Customer_ID': 'customer_id',
+				'Vehicle_ID': 'vehicle_id',
+				'Slot_Number': 'slotNumber',
+				'Date': 'date',
+				'Time': 'time',
+				'Technician': 'technician'
+			},
+			customer_chat: {
+				'Customer_ID': 'customer_id',
+				'Employee_ID': 'employee_id',
+				'Date': 'date',
+				'Description': 'description',
+				'Status': 'status'
+			},
+			job: {
+				'Type': 'type',
+				'Customer': 'customer',
+				'Date': 'date',
+				'Description': 'description',
+				'Price': 'price',
+				'Technician': 'technician'
 			}
-			// Add mappings for other entities as needed
 		};
 
 		const apiEndpoints = {
-		customer: '/dashboard/customers',
-		customer_delivery: '/dashboard/customer-deliveries',
-		customer_vehicle: '/dashboard/customer-vehicles',
-		Vehicle_Repairs: '/dashboard/vehicle-repairs',
-		Vehicle_Service: '/dashboard/vehicle-services',
-		Customer_Chat: '/dashboard/customer-chats',
-		employee: '/dashboard/employees',
-		product: '/dashboard/products',
-		job: '/dashboard/jobs'
+			customer: '/dashboard/customers',
+			customer_delivery: '/dashboard/customer-deliveries',
+			customer_vehicle: '/dashboard/customer-vehicles',
+			vehicle_repair: '/dashboard/vehicle-repairs',
+			vehicle_service: '/dashboard/vehicle-services',
+			repair_booking: '/dashboard/repair-bookings',
+			service_booking: '/dashboard/service-bookings',
+			customer_chat: '/dashboard/customer-chats',
+			employee: '/dashboard/employees',
+			part: '/dashboard/parts',
+			job: '/dashboard/jobs'
 		};
 
 		const tableBodyIds = {
-		customer: 'customerTableBody',
-		customer_delivery: 'customerDeliveryTableBody',
-		customer_vehicle: 'customerVehicleTableBody',
-		Vehicle_Repairs: 'vehicleRepairTableBody',
-		Vehicle_Service: 'vehicleServiceTableBody',
-		Customer_Chat: 'customerChatTableBody',
-		employee: 'employeeTableBody',
-		product: 'productTableBody',
-		job: 'jobTableBody'
+			customer: 'customerTableBody',
+			customer_delivery: 'customerDeliveryTable',
+			customer_vehicle: 'customerVehicleTable',
+			vehicle_repair: 'vehicleRepairTable',
+			vehicle_service: 'vehicleServiceTable',
+			repair_booking: 'repairBookingTable',
+			service_booking: 'serviceBookingTable',
+			customer_chat: 'customerChatTable',
+			employee: 'employeeTable',
+			part: 'productTable',
+			job: 'jobTable'
 		};
 
 		function showTab(id) {
-		tabIds.forEach(tab => document.getElementById(tab).classList.remove('active'));
-		document.getElementById(id).classList.add('active');
-		activeTab = id.replace('Tab', '');
-		formContext = activeTab;
+			tabIds.forEach(tab => document.getElementById(tab)?.classList.remove('active'));
+			document.getElementById(id)?.classList.add('active');
+			activeTab = id.replace('Tab', '');
+			
+			// Map tab names to form contexts
+			const tabMapping = {
+				'customer': 'customer',
+				'customerDelivery': 'customer_delivery',
+				'customerVehicle': 'customer_vehicle',
+				'vehicleRepair': 'vehicle_repair',
+				'vehicleService': 'vehicle_service',
+				'repairBooking': 'repair_booking',
+				'serviceBooking': 'service_booking',
+				'customerChat': 'customer_chat',
+				'employee': 'employee',
+				'product': 'part',
+				'job': 'job'
+			};
+			
+			formContext = tabMapping[activeTab] || activeTab;
 		}
 
 		function openModal(context) {
-		editTargetRow = null;
-		editMode = false;
-		editId = null;
-		formContext = context;
-		generateForm(fields[context]);
-		document.getElementById('modalTitle').innerText = `Add ${capitalize(context.replace('_', ' '))}`;
-		document.getElementById('formModal').classList.add('active');
+			editTargetRow = null;
+			editMode = false;
+			editId = null;
+			formContext = context;
+			generateForm(fields[context] || []);
+			document.getElementById('modalTitle').innerText = `Add ${capitalize(context.replace('_', ' '))}`;
+			document.getElementById('formModal').classList.add('active');
 		}
 
 		function editRow(btn, context) {
-		const row = btn.closest('tr');
-		editTargetRow = row;
-		editMode = true;
-		editId = row.dataset.id;
-		formContext = context;
-		
-		// Get values from row (skip ID and Action columns)
-		const values = Array.from(row.children).slice(1, -1).map(td => {
-			let text = td.innerText.trim();
-			if (text.startsWith('$')) {
-			text = text.substring(1);
-			}
-			return text;
-		});
-		
-		generateForm(fields[context], values);
-		document.getElementById('modalTitle').innerText = `Edit ${capitalize(context.replace('_', ' '))}`;
-		document.getElementById('formModal').classList.add('active');
+			const row = btn.closest('tr');
+			editTargetRow = row;
+			editMode = true;
+			editId = row.dataset.id;
+			formContext = context;
+			
+			// Get values from row (skip ID and Action columns)
+			const values = Array.from(row.children).slice(1, -1).map(td => {
+				let text = td.innerText.trim();
+				if (text.startsWith(')) {
+					text = text.substring(1);
+				}
+				return text;
+			});
+			
+			generateForm(fields[context] || [], values);
+			document.getElementById('modalTitle').innerText = `Edit ${capitalize(context.replace('_', ' '))}`;
+			document.getElementById('formModal').classList.add('active');
 		}
 
 		function generateForm(fieldNames, values = []) {
-		const form = document.getElementById('dynamicForm');
-		form.innerHTML = '';
-		fieldNames.forEach((field, i) => {
-			const fieldType = field.toLowerCase().includes('date') ? 'date' : 
-							field.toLowerCase().includes('price') || field.toLowerCase().includes('salary') || field.toLowerCase().includes('stock') ? 'number' : 
-							field.toLowerCase().includes('email') ? 'email' : 'text';
-			const step = fieldType === 'number' && (field.toLowerCase().includes('price') || field.toLowerCase().includes('salary')) ? '0.01' : '';
-			form.innerHTML += `
-			<div>
-				<label class='block mb-1 text-sm font-medium'>${field}</label>
-				<input type='${fieldType}' name='${field.replace(/\s+/g, '_')}' value='${values[i] || ''}' 
-					class='w-full border px-3 py-2 rounded' ${step ? `step='${step}'` : ''} required>
-			</div>`;
-		});
+			const form = document.getElementById('dynamicForm');
+			form.innerHTML = '';
+			fieldNames.forEach((field, i) => {
+				const fieldType = field.toLowerCase().includes('date') ? 'date' : 
+								field.toLowerCase().includes('time') ? 'time' :
+								field.toLowerCase().includes('price') || field.toLowerCase().includes('salary') || field.toLowerCase().includes('stock') || field.toLowerCase().includes('quantity') ? 'number' : 
+								field.toLowerCase().includes('email') ? 'email' : 'text';
+				const step = fieldType === 'number' && (field.toLowerCase().includes('price') || field.toLowerCase().includes('salary')) ? '0.01' : '';
+				
+				form.innerHTML += `
+				<div>
+					<label class='block mb-1 text-sm font-medium'>${field}</label>
+					<input type='${fieldType}' name='${field.replace(/\s+/g, '_')}' value='${values[i] || ''}' 
+						class='w-full border px-3 py-2 rounded' ${step ? `step='${step}'` : ''} required>
+				</div>`;
+			});
 		}
 
 		async function saveForm() {
-		const form = document.getElementById('dynamicForm');
-		const formData = new FormData(form);
-		
-		// Convert FormData to regular object with proper field mapping
-		const data = {};
-		for (let [key, value] of formData.entries()) {
-			// Apply field mapping if it exists for this context
-			if (fieldMapping[formContext] && fieldMapping[formContext][key]) {
-				data[fieldMapping[formContext][key]] = value;
-			} else {
-				// Convert field name to snake_case for database compatibility
-				const dbFieldName = key.toLowerCase().replace(/\s+/g, '_');
-				data[dbFieldName] = value;
-			}
-		}
-
-		console.log('Form Data:', data);
-		console.log('Form Context:', formContext);
-		console.log('Edit Mode:', editMode);
-		console.log('Edit ID:', editId);
-
-		try {
-			let url = apiEndpoints[formContext];
-			let method = 'POST';
+			const form = document.getElementById('dynamicForm');
+			const formData = new FormData(form);
 			
-			if (editMode && editId) {
-			url += `/${editId}`;
-			data._method = 'PUT';
+			// Convert FormData to regular object with proper field mapping
+			const data = {};
+			for (let [key, value] of formData.entries()) {
+				// Apply field mapping if it exists for this context
+				if (fieldMapping[formContext] && fieldMapping[formContext][key]) {
+					data[fieldMapping[formContext][key]] = value;
+				} else {
+					// Convert field name to snake_case for database compatibility
+					const dbFieldName = key.toLowerCase().replace(/\s+/g, '_');
+					data[dbFieldName] = value;
+				}
 			}
 
-			console.log('Request URL:', url);
-			console.log('Sending request...');
+			console.log('Form Data:', data);
+			console.log('Form Context:', formContext);
+			console.log('Edit Mode:', editMode);
+			console.log('Edit ID:', editId);
 
-			const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRF-TOKEN': csrfToken,
-				'Accept': 'application/json'
-			},
-			body: JSON.stringify(data)
-			});
-
-			console.log('Response Status:', response.status);
-			console.log('Response Headers:', response.headers);
-
-			// Log the raw response text first
-			const responseText = await response.text();
-			console.log('Raw Response:', responseText);
-
-			// Try to parse as JSON
-			let result;
 			try {
-			result = JSON.parse(responseText);
-			} catch (parseError) {
-			console.error('JSON Parse Error:', parseError);
-			console.error('Response was not valid JSON:', responseText);
-			alert('Server returned invalid response. Check console for details.');
-			return;
+				let url = apiEndpoints[formContext];
+				let method = 'POST';
+				
+				if (editMode && editId) {
+					url += `/${editId}`;
+					data._method = 'PUT';
+				}
+
+				console.log('Request URL:', url);
+				console.log('Sending request...');
+
+				const response = await fetch(url, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRF-TOKEN': csrfToken,
+						'Accept': 'application/json'
+					},
+					body: JSON.stringify(data)
+				});
+
+				console.log('Response Status:', response.status);
+
+				// Log the raw response text first
+				const responseText = await response.text();
+				console.log('Raw Response:', responseText);
+
+				// Try to parse as JSON
+				let result;
+				try {
+					result = JSON.parse(responseText);
+				} catch (parseError) {
+					console.error('JSON Parse Error:', parseError);
+					console.error('Response was not valid JSON:', responseText);
+					alert('Server returned invalid response. Check console for details.');
+					return;
+				}
+
+				console.log('Parsed Response:', result);
+
+				if (response.ok && result.success) {
+					alert(result.message || 'Operation completed successfully!');
+					closeModal();
+					
+					// Reload the page to refresh data
+					window.location.reload();
+				} else {
+					console.error('Error Response:', result);
+					alert('Error: ' + (result.message || result.error || 'Something went wrong'));
+				}
+			} catch (error) {
+				console.error('Fetch Error:', error);
+				alert('Network error occurred: ' + error.message);
 			}
-
-			console.log('Parsed Response:', result);
-
-			if (response.ok && result.success) {
-			alert(result.message || 'Operation completed successfully!');
-			closeModal();
-			
-			// Instead of full page reload, let's try to update just the table
-			if (!editMode) {
-				addRowToTable(data, formContext);
-			} else {
-				updateRowInTable(editTargetRow, data, formContext);
-			}
-			} else {
-			console.error('Error Response:', result);
-			alert('Error: ' + (result.message || 'Something went wrong'));
-			}
-		} catch (error) {
-			console.error('Fetch Error:', error);
-			alert('Network error occurred: ' + error.message);
-		}
-		}
-
-		function addRowToTable(data, context) {
-		const tableBodyId = tableBodyIds[context];
-		const tableBody = document.getElementById(tableBodyId);
-		
-		if (!tableBody) {
-			console.error('Table body not found:', tableBodyId);
-			location.reload(); // Fallback to page reload
-			return;
-		}
-
-		// Remove "No records found" row if it exists
-		const noRecordsRow = tableBody.querySelector('td[colspan]');
-		if (noRecordsRow) {
-			noRecordsRow.closest('tr').remove();
-		}
-
-		// Create new row (this is simplified - you might want to customize based on context)
-		const newRow = document.createElement('tr');
-		newRow.dataset.id = 'temp-' + Date.now(); // Temporary ID until page refresh
-		
-		// Add cells based on context - this is a simplified version
-		const values = Object.values(data);
-		newRow.innerHTML = `
-			<td class="px-4 py-2">New</td>
-			${values.map(value => `<td class="px-4 py-2">${value}</td>`).join('')}
-			<td class="px-4 py-2">
-			<button onclick="editRow(this, '${context}')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-			<button onclick="deleteRow(this, '${context}')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
-			</td>
-		`;
-		
-		tableBody.appendChild(newRow);
-		}
-
-		function updateRowInTable(row, data, context) {
-		const values = Object.values(data);
-		const cells = row.querySelectorAll('td');
-		
-		// Update cells (skip ID and Action columns)
-		for (let i = 1; i < cells.length - 1; i++) {
-			if (values[i - 1] !== undefined) {
-			cells[i].textContent = values[i - 1];
-			}
-		}
 		}
 
 		async function deleteRow(btn, context) {
-		if (!confirm('Are you sure you want to delete this record?')) {
-			return;
-		}
-
-		const row = btn.closest('tr');
-		const id = row.dataset.id;
-
-		console.log('Deleting:', context, 'ID:', id);
-
-		try {
-			const response = await fetch(`${apiEndpoints[context]}/${id}`, {
-			method: 'DELETE',
-			headers: {
-				'X-CSRF-TOKEN': csrfToken,
-				'Accept': 'application/json'
+			if (!confirm('Are you sure you want to delete this record?')) {
+				return;
 			}
-			});
 
-			const responseText = await response.text();
-			console.log('Delete Response Text:', responseText);
+			const row = btn.closest('tr');
+			const id = row.dataset.id;
 
-			let result;
+			console.log('Deleting:', context, 'ID:', id);
+
 			try {
-			result = JSON.parse(responseText);
-			} catch (parseError) {
-			console.error('Delete JSON Parse Error:', parseError);
-			alert('Server returned invalid response for delete operation.');
-			return;
-			}
+				const response = await fetch(`${apiEndpoints[context]}/${id}`, {
+					method: 'DELETE',
+					headers: {
+						'X-CSRF-TOKEN': csrfToken,
+						'Accept': 'application/json'
+					}
+				});
 
-			console.log('Delete Response:', result);
+				const responseText = await response.text();
+				console.log('Delete Response Text:', responseText);
 
-			if (response.ok && result.success) {
-			row.remove();
-			alert(result.message || 'Record deleted successfully!');
-			
-			// Check if table is empty and add "no records" row
-			const tableBodyId = tableBodyIds[context];
-			const tableBody = document.getElementById(tableBodyId);
-			if (tableBody && tableBody.children.length === 0) {
-				const colspan = tableBody.closest('table').querySelector('thead tr').children.length;
-				tableBody.innerHTML = `<tr><td colspan="${colspan}" class="px-4 py-2 text-center text-gray-500">No records found</td></tr>`;
+				let result;
+				try {
+					result = JSON.parse(responseText);
+				} catch (parseError) {
+					console.error('Delete JSON Parse Error:', parseError);
+					alert('Server returned invalid response for delete operation.');
+					return;
+				}
+
+				console.log('Delete Response:', result);
+
+				if (response.ok && result.success) {
+					row.remove();
+					alert(result.message || 'Record deleted successfully!');
+					
+					// Check if table is empty and add "no records" row
+					const tableBodyId = tableBodyIds[context];
+					const tableBody = document.getElementById(tableBodyId);
+					if (tableBody && tableBody.children.length === 0) {
+						const colspan = tableBody.closest('table').querySelector('thead tr').children.length;
+						tableBody.innerHTML = `<tr><td colspan="${colspan}" class="px-4 py-2 text-center text-gray-500">No records found</td></tr>`;
+					}
+				} else {
+					console.error('Delete Error:', result);
+					alert('Error deleting record: ' + (result.message || result.error || 'Unknown error'));
+				}
+			} catch (error) {
+				console.error('Delete Fetch Error:', error);
+				alert('Network error occurred: ' + error.message);
 			}
-			} else {
-			console.error('Delete Error:', result);
-			alert('Error deleting record: ' + (result.message || 'Unknown error'));
-			}
-		} catch (error) {
-			console.error('Delete Fetch Error:', error);
-			alert('Network error occurred: ' + error.message);
-		}
 		}
 
 		function closeModal() {
-		document.getElementById('formModal').classList.remove('active');
-		document.getElementById('dynamicForm').innerHTML = '';
-		editTargetRow = null;
-		editMode = false;
-		editId = null;
+			document.getElementById('formModal').classList.remove('active');
+			document.getElementById('dynamicForm').innerHTML = '';
+			editTargetRow = null;
+			editMode = false;
+			editId = null;
 		}
 
 		function capitalize(word) {
-		return word.charAt(0).toUpperCase() + word.slice(1);
+			return word.charAt(0).toUpperCase() + word.slice(1);
 		}
 
 		function toggleMobileMenu() {
-		const mobileMenu = document.querySelector('.mobile-menu');
-		mobileMenu.classList.toggle('active');
+			const mobileMenu = document.querySelector('.mobile-menu');
+			mobileMenu.classList.toggle('active');
 		}
 
-		// Test function
-		function testConnection() {
-		console.log('=== DEBUGGING INFORMATION ===');
-		console.log('JavaScript loaded successfully!');
-		console.log('CSRF Token available:', !!csrfToken);
-		console.log('CSRF Token value:', csrfToken);
-		console.log('API Endpoints:', apiEndpoints);
-		console.log('Table Body IDs:', tableBodyIds);
-		
-		// Test if we can find table bodies
-		Object.entries(tableBodyIds).forEach(([key, id]) => {
-			const element = document.getElementById(id);
-			console.log(`Table body ${key} (${id}):`, !!element);
-		});
-		
-		console.log('Current URL:', window.location.href);
-		console.log('Base URL for API calls:', window.location.origin);
-		console.log('==============================');
-		}
-
-		// Call test function when page loads
+		// Initialize dashboard when page loads
 		document.addEventListener('DOMContentLoaded', function() {
-		testConnection();
-		
-		// Test CSRF token by making a simple request
-		fetch('/dashboard/customers', {
-			method: 'POST',
-			headers: {
-			'Content-Type': 'application/json',
-			'X-CSRF-TOKEN': csrfToken,
-			'Accept': 'application/json'
-			},
-			body: JSON.stringify({test: true})
-		}).then(response => {
-			console.log('CSRF Token Test - Status:', response.status);
-			return response.text();
-		}).then(text => {
-			console.log('CSRF Token Test - Response:', text);
-		}).catch(error => {
-			console.log('CSRF Token Test - Error:', error);
+			console.log('Dashboard loaded successfully!');
+			console.log('CSRF Token:', csrfToken);
+			
+			// Show customer tab by default
+			showTab('customerTab');
 		});
+
+		const userRole = '{{ auth()->user()->role }}';
+
+		function initializeRoleBasedUI() {
+			const tabsToHide = [];
+			
+			if (userRole === 'technician') {
+				// Technicians can only see their jobs and job history
+				tabsToHide = [
+					'customerTab', 'customerDeliveryTab', 'employeeTab', 
+					'productTab', 'customerChatTab'
+				];
+			} else if (userRole === 'employee') {
+				// Employees cannot see customer management and employee management
+				tabsToHide = ['customerTab', 'employeeTab', 'customerChatTab'];
+			}
+			// Administrators can see all tabs
+			
+			tabsToHide.forEach(tabId => {
+				const tabButton = document.querySelector(`button[onclick="showTab('${tabId}')"]`);
+				if (tabButton) {
+					tabButton.style.display = 'none';
+				}
+			});
+			
+			// Show appropriate default tab
+			if (userRole === 'technician') {
+				showTab('jobTab');
+			} else if (userRole === 'employee') {
+				showTab('productTab');
+			} else {
+				showTab('customerTab');
+			}
+		}
+
+		// Call this function when page loads
+		document.addEventListener('DOMContentLoaded', function() {
+			initializeRoleBasedUI();
+			console.log('Dashboard loaded for role:', userRole);
 		});
 	</script>
 </body>
