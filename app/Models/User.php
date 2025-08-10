@@ -178,4 +178,16 @@ class User extends Authenticatable
 
         return null;
     }
+
+    // Override getAuthIdentifier to return the composite ID
+    public function getAuthIdentifier()
+    {
+        return $this->id;
+    }
+
+    // Override getAuthPassword to return the hashed password
+    public function getAuthPassword()
+    {
+        return $this->password;
+    }
 }

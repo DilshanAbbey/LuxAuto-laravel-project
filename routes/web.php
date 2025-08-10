@@ -26,17 +26,6 @@ Route::get('/contactus', function () {
     return view('contactus');
 });
 
-// Custom login/register page
-Route::get('/loginregister', function () {
-    return view('auth.loginregister');
-})->middleware('guest')->name('login');
-
-// Authentication routes
-Route::middleware('guest')->group(function () {
-    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-    Route::post('/register', [RegisteredUserController::class, 'store']);
-});
-
 // Protected routes
 Route::middleware('auth')->group(function () {
     // Dashboard - only for non-customers
@@ -48,6 +37,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Custom auth routes - handle login and register on same page
+Route::middleware('guest')->group(function () {
+    Route::get('/loginregister', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/loginregister', [AuthenticatedSessionController::class, 'store'])->name('login.post');
+    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register');
 });
 
 // Logout route

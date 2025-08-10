@@ -29,8 +29,9 @@ class CustomUserProvider implements UserProvider
             return null;
         }
 
-        $username = $credentials['username'] ?? $credentials['email'];
-        return User::findByCredentials($username, $credentials['password']);
+        // Don't validate password here, just find the user
+        $username = $credentials['email'];
+        return User::findByCredentials($username, null);
     }
 
     public function validateCredentials(Authenticatable $user, array $credentials)

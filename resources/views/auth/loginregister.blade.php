@@ -324,9 +324,18 @@
 
       <div class="p-10">
         <!-- Login Form -->
-        <form class="auth-form block" id="loginForm" method="POST" action="{{ route('login') }}">
+        <form class="auth-form block" id="loginForm" method="POST" action="/loginregister">
+          @csrf
           <h2 class="text-center mb-6 text-blue-500 text-2xl font-semibold">Welcome Back!</h2>
           
+          @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
+              @endforeach
+            </div>
+          @endif
+
           <div class="relative mb-6">
             <input type="email" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="loginEmail" placeholder="Email Address" value="{{ old('email') }}" required>
             <i class="fas fa-envelope absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-all duration-300"></i>
@@ -363,7 +372,8 @@
         </form>
 
         <!-- Register Form -->
-        <form class="auth-form hidden" id="registerForm" method="POST" action="{{ route('register') }}">
+        <form class="auth-form hidden" id="registerForm" method="POST" action="/register">
+          @csrf
           <h2 class="text-center mb-6 text-blue-500 text-2xl font-semibold">Create Account</h2>
           
           <div class="flex flex-wrap -mx-2">
@@ -650,96 +660,25 @@
       }
     });
 
-    // Form submissions
+    // Form submissions - Only validate, don't prevent submission
     document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
+      
+      // Show loading state
       const btn = document.getElementById('loginBtn');
-      
-      if (!validateEmail(email)) {
-        showValidation('loginEmail', 'Please enter a valid email address', false);
-        return;
-      }
-      
-      if (password.length === 0) {
-        showValidation('loginPassword', 'Password is required', false);
-        return;
-      }
-      
-      // Simulate API call
       btn.disabled = true;
       btn.querySelector('span').textContent = 'Signing In...';
       
-      setTimeout(() => {
-        alert('Login successful! (This is a demo)');
-        btn.disabled = false;
-        btn.querySelector('span').textContent = 'Sign In';
-      }, 2000);
+      // Let Laravel handle the form submission - no preventDefault
     });
 
     document.getElementById('registerForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const firstName = document.getElementById('firstName').value;
-      const lastName = document.getElementById('lastName').value;
-      const email = document.getElementById('registerEmail').value;
-      const phone = document.getElementById('phone').value;
-      const password = document.getElementById('registerPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const agreeTerms = document.getElementById('agreeTerms').checked;
       const btn = document.getElementById('registerBtn');
-      
-      let isValid = true;
-      
-      if (!validateName(firstName)) {
-        showValidation('firstName', 'Name must be at least 2 characters and contain only letters', false);
-        isValid = false;
-      }
-      
-      if (!validateName(lastName)) {
-        showValidation('lastName', 'Name must be at least 2 characters and contain only letters', false);
-        isValid = false;
-      }
-      
-      if (!validateEmail(email)) {
-        showValidation('registerEmail', 'Please enter a valid email address', false);
-        isValid = false;
-      }
-      
-      if (!validatePhone(phone)) {
-        showValidation('phone', 'Please enter a valid phone number', false);
-        isValid = false;
-      }
-      
-      const passwordChecks = validatePassword(password);
-      if (!Object.values(passwordChecks).every(Boolean)) {
-        showValidation('registerPassword', 'Password does not meet requirements', false);
-        isValid = false;
-      }
-      
-      if (password !== confirmPassword) {
-        showValidation('confirmPassword', 'Passwords do not match', false);
-        isValid = false;
-      }
-      
-      if (!agreeTerms) {
-        alert('Please agree to the terms and conditions');
-        isValid = false;
-      }
-      
-      if (!isValid) return;
-      
-      // Simulate API call
       btn.disabled = true;
       btn.querySelector('span').textContent = 'Creating Account...';
       
-      setTimeout(() => {
-        alert('Account created successfully! (This is a demo)');
-        btn.disabled = false;
-        btn.querySelector('span').textContent = 'Create Account';
-      }, 2000);
+      // Let Laravel handle the form submission - no preventDefault
     });
 
     // Loader
