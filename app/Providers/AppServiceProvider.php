@@ -3,14 +3,16 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Auth;
+use App\Providers\CustomUserProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    public const HOME = '/dashboard';
+
     /**
      * Register any application services.
      */
-
-    public const HOME = '/dashboard';
     
     public function register(): void
     {
@@ -22,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register the custom user provider
+        Auth::provider('custom', function ($app, array $config) {
+            return new CustomUserProvider();
+        });
     }
 }

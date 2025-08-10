@@ -37,4 +37,11 @@ class CustomUserProvider implements UserProvider
     {
         return password_verify($credentials['password'], $user->password);
     }
+
+    public function rehashPasswordIfRequired(Authenticatable $user, array $credentials, bool $force = false)
+    {
+        // For this custom implementation, we'll skip rehashing since users are virtual
+        // If you want to implement this, you'd need to update the original Customer/Employee records
+        return;
+    }
 }

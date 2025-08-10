@@ -82,6 +82,7 @@ class PartController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        $part = Part::findOrFail($id);
         return response()->json($part);
     }
 
@@ -95,6 +96,8 @@ class PartController extends Controller
         if (!$user->isAdministrator() && !$user->isEmployee()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
+
+        $part = Part::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
             'partName' => 'required|string|max:255',
@@ -137,6 +140,7 @@ class PartController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        $part = Part::findOrFail($id);
         $part->delete();
 
         return response()->json([

@@ -11,7 +11,7 @@ class CustomerSeeder extends Seeder
     public function run()
     {
         Customer::create([
-            'idCustomer' => 'CUST0001',
+            'idCustomer' => 'CUST001',
             'customerName' => 'Jane Customer',
             'email' => 'customer@luxauto.com',
             'contactNumber' => '1234567893',
@@ -20,7 +20,7 @@ class CustomerSeeder extends Seeder
         ]);
 
         Customer::create([
-            'idCustomer' => 'CUST0002',
+            'idCustomer' => 'CUST002',
             'customerName' => 'John Smith',
             'email' => 'john.smith@email.com',
             'contactNumber' => '1234567894',

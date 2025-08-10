@@ -10,8 +10,14 @@ class Part extends Model
     use HasFactory;
 
     protected $fillable = [
-        'part_name', 'part_number', 'brand', 
-        'model', 'price', 'description', 'stock'
+        'idPart',
+        'partName', 
+        'partNumber', 
+        'brand', 
+        'model', 
+        'price', 
+        'description', 
+        'quantityInStock'
     ];
 
     protected $casts = [
