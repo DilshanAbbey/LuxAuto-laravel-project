@@ -576,75 +576,30 @@
       }
     }
 
-    // Load products from API
+    // Load products from da
     async function loadProducts() {
       try {
-        // Simulate API call - replace with actual Laravel API endpoint
         const response = await fetch('/api/products');
         if (!response.ok) throw new Error('Failed to fetch products');
         
-        products = await response.json();
+        const products = await response.json();
+        
+        // Transform parts data to match expected format
+        this.products = products.map(part => ({
+            id: part.id,
+            name: part.partName,
+            price: parseFloat(part.price),
+            image: `https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=220&fit=crop&auto=format&q=80&seed=${part.id}`,
+            description: part.description,
+            features: ["High Quality", "OEM Compatible", "Warranty Included", "Fast Shipping"],
+            category: part.brand
+        }));
+        
         renderProducts();
       } catch (error) {
-        console.error('Failed to load products:', error);
-        // Fallback to mock data for demo
-        products = [
-          {
-            id: 1,
-            name: "Premium Brake Pad Set",
-            price: 45.99,
-            image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=220&fit=crop",
-            description: "High-performance ceramic brake pads for superior stopping power and reduced brake dust.",
-            features: ["Ceramic compound", "Low noise", "Extended life", "OEM quality"],
-            category: "Brakes"
-          },
-          {
-            id: 2,
-            name: "Premium Oil Filter",
-            price: 18.50,
-            image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=300&h=220&fit=crop",
-            description: "Advanced filtration technology for optimal engine protection and performance.",
-            features: ["Multi-layer filtration", "99% dirt removal", "Extended intervals", "Universal fit"],
-            category: "Engine"
-          },
-          {
-            id: 3,
-            name: "High-Flow Air Filter",
-            price: 32.00,
-            image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=300&h=220&fit=crop",
-            description: "Washable and reusable air filter designed for maximum airflow and engine efficiency.",
-            features: ["Washable", "Increased horsepower", "Better fuel economy", "Lifetime warranty"],
-            category: "Engine"
-          },
-          {
-            id: 4,
-            name: "LED Headlight Bulbs",
-            price: 89.99,
-            image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=300&h=220&fit=crop",
-            description: "Ultra-bright LED headlight conversion kit with 50,000+ hour lifespan.",
-            features: ["6000K cool white", "Plug & play", "50,000 hour life", "IP67 waterproof"],
-            category: "Lighting"
-          },
-          {
-            id: 5,
-            name: "Performance Spark Plugs",
-            price: 24.75,
-            image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=220&fit=crop",
-            description: "Iridium-tipped spark plugs for improved ignition and fuel efficiency.",
-            features: ["Iridium electrode", "Enhanced combustion", "Longer life", "Reduced emissions"],
-            category: "Engine"
-          },
-          {
-            id: 6,
-            name: "Cabin Air Filter",
-            price: 16.25,
-            image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=220&fit=crop",
-            description: "HEPA cabin air filter for clean, fresh air inside your vehicle.",
-            features: ["HEPA filtration", "Allergen protection", "Odor elimination", "Easy installation"],
-            category: "Interior"
-          }
-        ];
-        renderProducts();
+          console.error('Failed to load products:', error);
+          // Keep existing fallback products
+          showFallbackProducts();
       }
     }
 
