@@ -8,8 +8,6 @@ use App\Providers\CustomUserProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public const HOME = '/dashboard';
-
     /**
      * Register any application services.
      */
@@ -24,9 +22,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Register the custom user provider
-        Auth::provider('custom', function ($app, array $config) {
-            return new CustomUserProvider();
-        });
+        
     }
 }

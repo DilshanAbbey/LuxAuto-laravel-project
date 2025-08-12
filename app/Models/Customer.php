@@ -18,6 +18,29 @@ class Customer extends Model
         'password'
     ];
 
+    // Automatically sync to users table when customer is created/updated
+    protected static function booted()
+    {
+        static::created(function ($customer) {
+            User::syncFromCustomer($customer);
+        });
+
+        static::updated(function ($customer) {
+            User::syncFromCustomer($customer);
+        });
+
+        static::deleted(function ($customer) {
+            User::where('user_type', 'customer')
+                ->where('original_id', $customer->id)
+                ->delete();
+        });
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'original_id')->where('user_type', 'customer');
+    }
+
     public function deliveries()
     {
         return $this->hasMany(CustomerDelivery::class);
