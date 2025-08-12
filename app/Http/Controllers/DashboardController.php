@@ -24,7 +24,19 @@ class DashboardController extends Controller
         $user = auth()->user();
         
         // Base data that all dashboard users can see
-        $data = [];
+        $data = [
+            'customers' => collect(),
+            'employees' => collect(),
+            'parts' => collect(),
+            'jobs' => collect(),
+            'customerDeliveries' => collect(),
+            'customerVehicles' => collect(),
+            'vehicleRepairs' => collect(),
+            'vehicleServices' => collect(),
+            'repairBooking' => collect(),
+            'serviceBooking' => collect(),
+            'customerChats' => collect(),
+        ];
 
         if ($user->isAdministrator()) {
             // Administrators can see everything
@@ -74,6 +86,7 @@ class DashboardController extends Controller
                 'customerChats' => collect(),
             ];
         }
+        
 
         return view('auth.dashboard', compact('data'));
     }

@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use Illuminate\Validation\ValidationException;
-use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -19,30 +19,42 @@ class AuthenticatedSessionController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
 
-        // Find user by credentials
-        $user = User::findByCredentials($request->email, $request->password);
+        Log::info('Login attempt for: ' . $credentials['email']);
 
-        if (!$user) {
-            throw ValidationException::withMessages([
-                'email' => __('The provided credentials do not match our records.'),
-            ]);
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            
+            $user = Auth::user();
+            Log::info('User authenticated: ' . $user->email . ' with role: ' . $user->role);
+
+            // Redirect based on role
+            switch (strtolower($user->role)) {
+                case 'customer':
+                    Log::info('Redirecting customer to shop');
+                    return redirect('/shop');
+                
+                case 'administrator':
+                case 'employee':
+                case 'technician':
+                    Log::info('Redirecting ' . $user->role . ' to dashboard');
+                    return redirect('/dashboard');
+                
+                default:
+                    Log::info('Unknown role: ' . $user->role . ', redirecting to dashboard');
+                    return redirect('/dashboard');
+            }
         }
 
-        Auth::login($user, $request->boolean('remember'));
+        Log::info('Authentication failed for: ' . $credentials['email']);
 
-        $request->session()->regenerate();
-
-        // Redirect based on role
-        if ($user->isCustomer()) {
-            return redirect()->intended('/shop');
-        } else {
-            return redirect()->intended('/dashboard');
-        }
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
 
     public function destroy(Request $request): RedirectResponse
