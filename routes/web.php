@@ -15,19 +15,27 @@ Route::get('/aboutus', function () {
     return view('aboutus');
 });
 
-Route::get('/shop', [App\Http\Controllers\ShopController::class, 'index'])
-    ->middleware(['auth', 'role:customer'])
-    ->name('shop');
-
-Route::get('/api/products', [App\Http\Controllers\ShopController::class, 'getProducts'])
-    ->middleware(['auth', 'role:customer']);
-
 Route::get('/contactus', function () {
     return view('contactus');
 });
 
+// Auth routes for guests
+Route::middleware('guest')->group(function () {
+    Route::get('/loginregister', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/loginregister', [AuthenticatedSessionController::class, 'store']);
+    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register');
+});
+
 // Protected routes
 Route::middleware('auth')->group(function () {
+    // Shop - only for customers
+    Route::get('/shop', [App\Http\Controllers\ShopController::class, 'index'])
+        ->middleware('role:customer')
+        ->name('shop');
+
+    Route::get('/api/products', [App\Http\Controllers\ShopController::class, 'getProducts'])
+        ->middleware('role:customer');
+
     // Dashboard - only for non-customers
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('role:administrator,employee,technician')
@@ -37,23 +45,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Logout
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 
-// Custom auth routes - handle login and register on same page
-Route::middleware('guest')->group(function () {
-    Route::get('/loginregister', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/loginregister', [AuthenticatedSessionController::class, 'store'])->name('login.post');
-    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register');
-});
-
-// Logout route
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth')
-    ->name('logout');
-
-require __DIR__.'/auth.php';
-
-// Dashboard API routes (using web middleware for CSRF)
+// Dashboard API routes
 Route::middleware(['auth', 'role:administrator,employee,technician'])->prefix('dashboard')->group(function () {
     Route::apiResource('customers', App\Http\Controllers\Api\CustomerController::class);
     Route::apiResource('employees', App\Http\Controllers\Api\EmployeeController::class);
