@@ -16,13 +16,6 @@
           colors: {
             'primary-bg': '#e0f0ff',
             'accent-blue': '#007bff',
-          },
-          keyframes: {
-            pulse: {
-              '0%': { boxShadow: '0 4px 20px rgba(0, 123, 255, 0.4)' },
-              '50%': { boxShadow: '0 4px 20px rgba(0, 123, 255, 0.8)' },
-              '100%': { boxShadow: '0 4px 20px rgba(0, 123, 255, 0.4)' },
-            }
           }
         }
       }
@@ -36,7 +29,6 @@
       background-attachment: fixed;
     }
 
-    /* Add this for the overlay */
     body::before {
         content: "";
         position: absolute;
@@ -44,11 +36,10 @@
         left: 0;
         height: 100%;
         width: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+        background-color: rgba(0, 0, 0, 0.5);
         z-index: 1;
     }
 
-    /* Put your content above the overlay */
     body > * {
         position: relative;
         z-index: 2;
@@ -108,15 +99,6 @@
       background-color: #007bff;
       color: white;
       transform: translateY(-2px);
-    }
-    
-    .fade-in {
-      animation: fadeIn 0.5s ease-in;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
     }
     
     .success-animation {
@@ -226,7 +208,6 @@
         display: none;
       }
     }
-	
   </style>
 </head>
 <body class="bg-gray-100">
@@ -236,7 +217,7 @@
     <nav class="bg-white shadow-lg p-3">
       <div class="max-w-7xl mx-auto">
         <div class="flex justify-between items-center">
-          <a class="text-accent-blue font-bold text-xl" href="brandnewcommerce.html">LuxParts</a>
+          <a class="text-accent-blue font-bold text-xl" href="/">LuxParts</a>
           
           <!-- Mobile menu button -->
           <button class="mobile-menu-button md:hidden text-gray-500 hover:text-gray-700 focus:outline-none" onclick="toggleMobileMenu()">
@@ -271,8 +252,6 @@
   
   <!-- Menu Icons -->
   <div class="flex items-center ml-3 space-x-2">
-
-    <div class="absolute inset-0 bg-black opacity-60 z-0"></div>
     <!-- Shopping Cart -->
     <div class="menu-icon relative p-2 rounded-lg text-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer" onclick="toggleOffcanvas('cartOffcanvas')">
       <i class="fas fa-shopping-cart text-lg"></i>
@@ -298,24 +277,23 @@
         <p class="text-gray-600 text-lg">Discover high-quality spare parts for your vehicle</p>
       </div>
 	  
-	  <div class="mt-4 flex justify-center">
-	  <input
-		type="text"
-		id="searchInput"
-		placeholder="Search for products..."
-		class="w-full max-w-lg px-4 py-2 border rounded-l-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-	  <button
-		onclick="filterProducts()"
-		class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 transition">
-		Search
-	  </button>
-	</div>
-  <div>
-    <div>
+	  <div class="mt-4 flex justify-center mb-8">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search for products..."
+          class="w-full max-w-lg px-4 py-2 border rounded-l-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        <button
+          onclick="filterProducts()"
+          class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 transition">
+          Search
+        </button>
+      </div>
+
       <!-- Product Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="productGrid">
         <!-- Products will be loaded from database -->
-        <div class="text-center py-10">
+        <div class="col-span-full text-center py-10">
           <i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i>
           <p class="text-gray-600 mt-3">Loading products...</p>
         </div>
@@ -398,14 +376,6 @@
           <i class="fas fa-shield-alt mr-3 text-gray-600"></i>
           <span>Privacy & Security</span>
         </a>
-        <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded">
-          <i class="fas fa-download mr-3 text-gray-600"></i>
-          <span>App Updates</span>
-        </a>
-        <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded">
-          <i class="fas fa-question-circle mr-3 text-gray-600"></i>
-          <span>Help & Support</span>
-        </a>
       </div>
     </div>
   </div>
@@ -425,17 +395,17 @@
             <i class="fas fa-user text-white text-2xl"></i>
           </div>
           <h5 class="mt-3 mb-1 font-semibold" id="userName">Loading...</h5>
-          <p class="text-gray-600" id="userType">Loading...</p>
-          <p class="text-gray-500 text-sm" id="userEmail"></p>
-          <p class="text-gray-500 text-sm" id="userPhone"></p>
+          <p class="text-gray-600 text-sm" id="userType">Loading...</p>
+          <p class="text-gray-500 text-sm" id="userEmail">Loading...</p>
+          <p class="text-gray-500 text-sm" id="userPhone">Loading...</p>
         </div>
       </div>
       
       <div class="space-y-1">
-        <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded" onclick="editProfile()">
+        <button class="w-full text-left flex items-center p-3 hover:bg-gray-50 rounded" onclick="editProfile()">
           <i class="fas fa-edit mr-3 text-gray-600"></i>
           <span>Edit Profile</span>
-        </a>
+        </button>
         <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded">
           <i class="fas fa-box mr-3 text-gray-600"></i>
           <span>My Orders</span>
@@ -447,10 +417,6 @@
         <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded">
           <i class="fas fa-map-marker-alt mr-3 text-gray-600"></i>
           <span>Addresses</span>
-        </a>
-        <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded">
-          <i class="fas fa-credit-card mr-3 text-gray-600"></i>
-          <span>Payment Methods</span>
         </a>
         <form method="POST" action="{{ route('logout') }}" class="block">
           @csrf
@@ -489,24 +455,8 @@
         
         <h6 class="font-semibold mb-3">Payment Method</h6>
         <div class="flex flex-wrap gap-2 mb-3">
-          <div class="payment-method selected border-2 border-blue-600 bg-blue-50 rounded-lg p-3 cursor-pointer" data-method="card">
-            <i class="fas fa-credit-card mr-2"></i>Card
-          </div>
-          <div class="payment-method border-2 border-gray-300 bg-white rounded-lg p-3 cursor-pointer" data-method="paypal">
-            <i class="fab fa-paypal mr-2"></i>PayPal
-          </div>
-          <div class="payment-method border-2 border-gray-300 bg-white rounded-lg p-3 cursor-pointer" data-method="apple">
-            <i class="fab fa-apple-pay mr-2"></i>Apple Pay
-          </div>
-        </div>
-        
-        <div id="cardDetails" class="mb-3">
-          <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Card Information</label>
-            <div id="card-element" class="w-full p-3 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-              <!-- Stripe Elements will create form elements here -->
-            </div>
-            <div id="card-errors" role="alert" class="text-red-600 text-sm mt-1"></div>
+          <div class="payment-method selected border-2 border-blue-600 bg-blue-50 rounded-lg p-3 cursor-pointer" data-method="demo">
+            <i class="fas fa-credit-card mr-2"></i>Demo Payment
           </div>
         </div>
         
@@ -561,26 +511,16 @@
     let currentProduct = null;
     let products = [];
     let user = null;
-    let stripeClientSecret = null;
+    let filteredProducts = [];
 
-    // Initialize Stripe
-    const stripe = Stripe('{{ config("payment.stripe.public_key") }}');
-    const elements = stripe.elements();
-
-    const cardElement = elements.create('card', {
-      style: {
-        base: {
-          fontSize: '16px',
-          color: '#424770',
-          '::placeholder': {
-            color: '#aab7c4',
-          },
-        },
-      },
-    });
+    // Get CSRF token
+    function getCSRFToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.content || '';
+    }
 
     // Initialize the application
     async function initApp() {
+      console.log('Initializing app...');
       try {
         await Promise.all([
           loadProducts(),
@@ -597,18 +537,28 @@
 
     // Load products from database
     async function loadProducts() {
+      console.log('Loading products...');
       try {
-        const response = await fetch('/api/products');
-        if (!response.ok) throw new Error('Failed to fetch products');
+        const response = await fetch('/api/products', {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': getCSRFToken()
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const parts = await response.json();
+        console.log('Products loaded:', parts);
         
         // Transform parts data to match expected format
-        products = parts.map(part => ({
+        products = parts.map((part, index) => ({
           id: part.id,
           name: part.partName,
           price: parseFloat(part.price),
-          image: `https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=220&fit=crop&auto=format&q=80&seed=${part.id}`,
+          image: `https://images.unsplash.com/photo-${1558618047 + index}-3c8c76ca7d13?w=300&h=220&fit=crop&auto=format&q=80&seed=${part.id}`,
           description: part.description,
           features: ["High Quality", "OEM Compatible", "Warranty Included", "Fast Shipping"],
           category: part.brand,
@@ -617,33 +567,39 @@
           quantityInStock: part.quantityInStock
         }));
         
+        filteredProducts = [...products];
         renderProducts();
       } catch (error) {
         console.error('Failed to load products:', error);
-        showFallbackProducts();
+        showNoProducts();
       }
     }
 
     // Load user information from API
     async function loadUserInfo() {
+      console.log('Loading user info...');
       try {
         const response = await fetch('/api/user', {
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            'X-CSRF-TOKEN': getCSRFToken()
           }
         });
         
-        if (!response.ok) throw new Error('Failed to fetch user info');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         user = await response.json();
+        console.log('User loaded:', user);
         updateUserDisplay();
       } catch (error) {
         console.error('Failed to load user info:', error);
         user = {
           name: "Guest User",
           email: "guest@example.com",
+          phone: "",
           type: "Customer"
         };
         updateUserDisplay();
@@ -652,24 +608,30 @@
 
     // Load cart from database
     async function loadCart() {
+      console.log('Loading cart...');
       try {
         const response = await fetch('/api/cart', {
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            'X-CSRF-TOKEN': getCSRFToken()
           }
         });
         
-        if (!response.ok) throw new Error('Failed to fetch cart');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const cartItems = await response.json();
+        console.log('Cart loaded:', cartItems);
+        
         cart = cartItems.map(item => ({
           id: item.part.id,
           name: item.part.partName,
           price: parseFloat(item.part.price),
           image: `https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=220&fit=crop&auto=format&q=80&seed=${item.part.id}`,
           quantity: item.quantity,
-          category: item.part.brand
+          category: item.part.brand,
+          cartItemId: item.id
         }));
         
       } catch (error) {
@@ -680,13 +642,14 @@
 
     // Add product to cart
     async function addToCart(productId) {
+      console.log('Adding to cart:', productId);
       try {
         const response = await fetch('/api/cart', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            'X-CSRF-TOKEN': getCSRFToken()
           },
           body: JSON.stringify({
             part_id: productId,
@@ -694,20 +657,27 @@
           })
         });
 
-        if (!response.ok) throw new Error('Failed to add to cart');
+        const result = await response.json();
         
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to add to cart');
+        }
+        
+        console.log('Added to cart successfully:', result);
         await loadCart();
         updateCartBadge();
         updateCartDisplay();
         
         // Show success animation
         const button = event.target.closest('button');
-        button.classList.add('success-animation');
-        setTimeout(() => button.classList.remove('success-animation'), 600);
+        if (button) {
+          button.classList.add('success-animation');
+          setTimeout(() => button.classList.remove('success-animation'), 600);
+        }
         
       } catch (error) {
         console.error('Failed to add to cart:', error);
-        alert('Failed to add item to cart');
+        alert('Failed to add item to cart: ' + error.message);
       }
     }
 
@@ -724,22 +694,23 @@
       }
       
       try {
-        const cartItem = await findCartItem(productId);
-        if (!cartItem) return;
-        
-        const response = await fetch(`/api/cart/${cartItem.id}`, {
+        const response = await fetch(`/api/cart/${item.cartItemId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            'X-CSRF-TOKEN': getCSRFToken()
           },
           body: JSON.stringify({
             quantity: newQuantity
           })
         });
 
-        if (!response.ok) throw new Error('Failed to update quantity');
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to update quantity');
+        }
         
         await loadCart();
         updateCartBadge();
@@ -747,25 +718,29 @@
         
       } catch (error) {
         console.error('Failed to update quantity:', error);
-        alert('Failed to update item quantity');
+        alert('Failed to update item quantity: ' + error.message);
       }
     }
 
     // Remove from cart
     async function removeFromCart(productId) {
       try {
-        const cartItem = await findCartItem(productId);
-        if (!cartItem) return;
+        const item = cart.find(item => item.id === productId);
+        if (!item) return;
         
-        const response = await fetch(`/api/cart/${cartItem.id}`, {
+        const response = await fetch(`/api/cart/${item.cartItemId}`, {
           method: 'DELETE',
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            'X-CSRF-TOKEN': getCSRFToken()
           }
         });
 
-        if (!response.ok) throw new Error('Failed to remove from cart');
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to remove from cart');
+        }
         
         await loadCart();
         updateCartBadge();
@@ -773,52 +748,55 @@
         
       } catch (error) {
         console.error('Failed to remove from cart:', error);
-        alert('Failed to remove item from cart');
-      }
-    }
-
-    // Helper function to find cart item
-    async function findCartItem(productId) {
-      try {
-        const response = await fetch('/api/cart');
-        const cartItems = await response.json();
-        return cartItems.find(item => item.part.id === productId);
-      } catch (error) {
-        console.error('Failed to find cart item:', error);
-        return null;
+        alert('Failed to remove item from cart: ' + error.message);
       }
     }
 
     // Update user display
     function updateUserDisplay() {
       if (user) {
-        document.getElementById('userName').textContent = user.name;
-        document.getElementById('userType').textContent = user.type;
+        document.getElementById('userName').textContent = user.name || 'N/A';
+        document.getElementById('userType').textContent = user.type || 'N/A';
+        document.getElementById('userEmail').textContent = user.email || 'N/A';
+        document.getElementById('userPhone').textContent = user.phone || 'N/A';
       }
+    }
+
+    // Show no products message
+    function showNoProducts() {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = `
+        <div class="col-span-full text-center py-10">
+          <i class="fas fa-box-open text-6xl text-gray-400 mb-4"></i>
+          <p class="text-gray-600 text-lg">No products available</p>
+          <p class="text-gray-500 text-sm">Please check back later or contact support</p>
+        </div>
+      `;
     }
 
     // Render products
     function renderProducts() {
       const grid = document.getElementById('productGrid');
-      if (!products.length) {
+      
+      if (!filteredProducts.length) {
         grid.innerHTML = `
           <div class="col-span-full text-center py-10">
             <i class="fas fa-box-open text-6xl text-gray-400 mb-4"></i>
-            <p class="text-gray-600 text-lg">No products available</p>
+            <p class="text-gray-600 text-lg">No products found</p>
           </div>
         `;
         return;
       }
 
-      grid.innerHTML = products.map(product => `
+      grid.innerHTML = filteredProducts.map(product => `
         <div class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-          <img src="${product.image}" class="w-full h-48 object-cover" alt="${product.name}">
+          <img src="${product.image}" class="w-full h-48 object-cover" alt="${product.name}" loading="lazy">
           <div class="p-4">
             <h5 class="font-semibold text-lg mb-2">${product.name}</h5>
-            <p class="text-gray-600 text-sm mb-3">${product.description}</p>
+            <p class="text-gray-600 text-sm mb-3 line-clamp-2">${product.description}</p>
             <div class="flex justify-between items-center mb-3">
               <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${product.category}</span>
-              <span class="text-green-600 font-bold text-lg">$${product.price}</span>
+              <span class="text-green-600 font-bold text-lg">${product.price.toFixed(2)}</span>
             </div>
             <div class="flex gap-2">
               <button 
@@ -827,13 +805,14 @@
                 <i class="fas fa-info-circle mr-1"></i>Info
               </button>
               <button 
-                class="flex-1 bg-green-600 text-white py-2 px-3 rounded hover:bg-green-700 transition-colors text-sm"
+                class="flex-1 bg-green-600 text-white py-2 px-3 rounded hover:bg-green-700 transition-colors text-sm ${product.quantityInStock <= 0 ? 'opacity-50 cursor-not-allowed' : ''}"
                 onclick="addToCart(${product.id})"
                 ${product.quantityInStock <= 0 ? 'disabled' : ''}>
                 <i class="fas fa-cart-plus mr-1"></i>Add
               </button>
             </div>
-            ${product.quantityInStock <= 0 ? '<p class="text-red-500 text-xs mt-2">Out of Stock</p>' : ''}
+            ${product.quantityInStock <= 0 ? '<p class="text-red-500 text-xs mt-2">Out of Stock</p>' : 
+              product.quantityInStock <= 5 ? `<p class="text-orange-500 text-xs mt-2">Only ${product.quantityInStock} left!</p>` : ''}
           </div>
         </div>
       `).join('');
@@ -842,6 +821,11 @@
     // Show product information
     function showProductInfo(productId) {
       const product = products.find(p => p.id === productId);
+      if (!product) {
+        console.error('Product not found:', productId);
+        return;
+      }
+      
       currentProduct = product;
       
       document.getElementById('modalTitle').textContent = product.name;
@@ -851,7 +835,7 @@
             <img src="${product.image}" class="w-full rounded-lg" alt="${product.name}">
           </div>
           <div>
-            <h4 class="text-2xl font-bold text-green-600 mb-3">$${product.price}</h4>
+            <h4 class="text-2xl font-bold text-green-600 mb-3">${product.price.toFixed(2)}</h4>
             <p class="mb-4">${product.description}</p>
             <div class="mb-4">
               <h6 class="font-semibold mb-2">Details:</h6>
@@ -869,6 +853,18 @@
           </div>
         </div>
       `;
+      
+      // Update modal add to cart button
+      const modalBtn = document.getElementById('modalAddToCart');
+      if (product.quantityInStock <= 0) {
+        modalBtn.disabled = true;
+        modalBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        modalBtn.innerHTML = 'Out of Stock';
+      } else {
+        modalBtn.disabled = false;
+        modalBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        modalBtn.innerHTML = 'Add to Cart';
+      }
       
       showModal('productModal');
     }
@@ -889,6 +885,7 @@
           <div class="text-center py-8">
             <i class="fas fa-shopping-cart text-4xl text-gray-400 mb-3"></i>
             <p class="text-gray-600">Your cart is empty</p>
+            <p class="text-gray-500 text-sm">Add some items to get started!</p>
           </div>
         `;
         checkoutSummary.classList.add('hidden');
@@ -896,21 +893,25 @@
       }
       
       cartItems.innerHTML = cart.map(item => `
-        <div class="border-b pb-4 mb-4">
+        <div class="border-b pb-4 mb-4 last:border-b-0">
           <div class="flex items-center gap-3">
             <img src="${item.image}" class="w-16 h-16 object-cover rounded" alt="${item.name}">
             <div class="flex-1">
               <h6 class="font-semibold">${item.name}</h6>
-              <p class="text-gray-600 text-sm">$${item.price.toFixed(2)} each</p>
+              <p class="text-gray-600 text-sm">${item.price.toFixed(2)} each</p>
+              <p class="text-gray-500 text-xs">${item.category}</p>
             </div>
             <div class="flex items-center gap-2">
-              <button class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded flex items-center justify-center" onclick="updateQuantity(${item.id}, -1)">-</button>
+              <button class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded flex items-center justify-center transition-colors" onclick="updateQuantity(${item.id}, -1)">-</button>
               <span class="w-8 text-center">${item.quantity}</span>
-              <button class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded flex items-center justify-center" onclick="updateQuantity(${item.id}, 1)">+</button>
-              <button class="text-red-500 hover:text-red-700 ml-2" onclick="removeFromCart(${item.id})">
+              <button class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded flex items-center justify-center transition-colors" onclick="updateQuantity(${item.id}, 1)">+</button>
+              <button class="text-red-500 hover:text-red-700 ml-2 transition-colors" onclick="removeFromCart(${item.id})">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
+          </div>
+          <div class="text-right mt-2">
+            <span class="text-sm font-semibold">Total: ${(item.price * item.quantity).toFixed(2)}</span>
           </div>
         </div>
       `).join('');
@@ -922,13 +923,14 @@
     // Update cart summary
     function updateCartSummary() {
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const shipping = 5.99;
+      const shipping = subtotal > 100 ? 0 : 5.99; // Free shipping over $100
       const total = subtotal + shipping;
       
-      document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-      document.getElementById('total').textContent = `$${total.toFixed(2)}`;
-      document.getElementById('checkoutSubtotal').textContent = `$${subtotal.toFixed(2)}`;
-      document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
+      document.getElementById('subtotal').textContent = `${subtotal.toFixed(2)}`;
+      document.getElementById('shipping').textContent = shipping === 0 ? 'FREE' : `${shipping.toFixed(2)}`;
+      document.getElementById('total').textContent = `${total.toFixed(2)}`;
+      document.getElementById('checkoutSubtotal').textContent = `${subtotal.toFixed(2)}`;
+      document.getElementById('checkoutTotal').textContent = `${total.toFixed(2)}`;
     }
 
     // Show checkout
@@ -948,76 +950,25 @@
       }
     }
 
-    // Create payment intent
-    async function createPaymentIntent() {
-      try {
-        const shippingAddress = {
-          name: document.getElementById('fullName').value,
-          email: document.getElementById('email').value,
-          address: document.getElementById('address').value
-        };
-
-        const response = await fetch('/api/payment/intent', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-          },
-          body: JSON.stringify({ shipping_address: shippingAddress })
-        });
-
-        if (!response.ok) throw new Error('Failed to create payment intent');
-        
-        const data = await response.json();
-        stripeClientSecret = data.client_secret;
-        return data;
-        
-      } catch (error) {
-        console.error('Failed to create payment intent:', error);
-        throw error;
-      }
-    }
-
-    // Process payment (simplified for demo)
+    // Process payment (demo version)
     async function processPayment() {
       try {
-        const paymentData = await createPaymentIntent();
-        
-        // In a real implementation, you would use Stripe Elements here
-        // For demo purposes, we'll simulate a successful payment
         const shippingAddress = {
           name: document.getElementById('fullName').value,
           email: document.getElementById('email').value,
           address: document.getElementById('address').value
         };
 
-        const response = await fetch('/api/payment/confirm', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-          },
-          body: JSON.stringify({
-            payment_intent_id: 'demo_payment_' + Date.now(),
-            shipping_address: shippingAddress
-          })
-        });
-
-        if (!response.ok) throw new Error('Payment failed');
+        // Simulate payment processing
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        const result = await response.json();
-        
-        // Clear cart and show success
+        // Clear cart
         cart = [];
         updateCartBadge();
         updateCartDisplay();
         closeOffcanvas('checkoutOffcanvas');
         
         alert('Order placed successfully! Thank you for your purchase.');
-        
-        return result;
         
       } catch (error) {
         console.error('Payment failed:', error);
@@ -1026,30 +977,73 @@
       }
     }
 
-    // Checkout form submission
-    document.addEventListener('DOMContentLoaded', function() {
-      const checkoutForm = document.getElementById('checkoutForm');
-      if (checkoutForm) {
-        checkoutForm.addEventListener('submit', async function(e) {
-          e.preventDefault();
-          
-          const submitBtn = e.target.querySelector('button[type="submit"]');
-          const originalText = submitBtn.innerHTML;
-          
-          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-          submitBtn.disabled = true;
-          
-          try {
-            await processPayment();
-          } catch (error) {
-            console.error('Checkout failed:', error);
-          } finally {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-          }
-        });
+    // Filter products
+    function filterProducts() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      
+      if (!searchTerm) {
+        filteredProducts = [...products];
+      } else {
+        filteredProducts = products.filter(product => 
+          product.name.toLowerCase().includes(searchTerm) ||
+          product.description.toLowerCase().includes(searchTerm) ||
+          product.category.toLowerCase().includes(searchTerm) ||
+          product.partNumber.toLowerCase().includes(searchTerm)
+        );
       }
-    });
+      
+      renderProducts();
+    }
+
+    // Edit profile functionality
+    async function editProfile() {
+      if (!user) {
+        alert('User information not available');
+        return;
+      }
+
+      const name = prompt('Enter your name:', user.name || '');
+      if (!name || name.trim() === '') return;
+
+      const email = prompt('Enter your email:', user.email || '');
+      if (!email || email.trim() === '') return;
+
+      const phone = prompt('Enter your phone:', user.phone || '');
+      
+      try {
+        const response = await fetch('/api/user', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': getCSRFToken()
+          },
+          body: JSON.stringify({
+            customerName: name.trim(),
+            email: email.trim(),
+            contactNumber: phone.trim()
+          })
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to update profile');
+        }
+        
+        // Update local user object
+        user.name = name.trim();
+        user.email = email.trim();
+        user.phone = phone.trim();
+        
+        updateUserDisplay();
+        alert('Profile updated successfully!');
+        
+      } catch (error) {
+        console.error('Failed to update profile:', error);
+        alert('Failed to update profile: ' + error.message);
+      }
+    }
 
     // Utility functions
     function toggleOffcanvas(id) {
@@ -1092,115 +1086,38 @@
       alert(message); // In production, use a proper toast/notification system
     }
 
-    function showFallbackProducts() {
-      // Fallback products for demo
-      products = [
-        {
-          id: 1,
-          name: "Brake Pad Set",
-          price: 45.99,
-          image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=220&fit=crop&auto=format&q=80",
-          description: "High-performance brake pads for optimal stopping power",
-          features: ["High Quality", "OEM Compatible", "Warranty Included", "Fast Shipping"],
-          category: "Bosch",
-          partNumber: "BP001",
-          model: "Universal",
-          quantityInStock: 15
-        },
-        {
-          id: 2,
-          name: "Air Filter",
-          price: 19.99,
-          image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=300&h=220&fit=crop&auto=format&q=80",
-          description: "Premium air filter for enhanced engine performance",
-          features: ["High Quality", "OEM Compatible", "Warranty Included", "Fast Shipping"],
-          category: "K&N",
-          partNumber: "AF002",
-          model: "Universal",
-          quantityInStock: 23
-        }
-      ];
-      renderProducts();
-    }
-
-    function filterProducts() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      
-      if (!searchTerm) {
-        renderProducts();
-        return;
-      }
-      
-      const filteredProducts = products.filter(product => 
-        product.name.toLowerCase().includes(searchTerm) ||
-        product.description.toLowerCase().includes(searchTerm) ||
-        product.category.toLowerCase().includes(searchTerm) ||
-        product.partNumber.toLowerCase().includes(searchTerm)
-      );
-      
-      const grid = document.getElementById('productGrid');
-      if (filteredProducts.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full text-center py-10">
-            <i class="fas fa-search text-6xl text-gray-400 mb-4"></i>
-            <p class="text-gray-600 text-lg">No products found matching "${searchTerm}"</p>
-            <button onclick="document.getElementById('searchInput').value=''; filterProducts();" 
-                    class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-              Clear Search
-            </button>
-          </div>
-        `;
-        return;
-      }
-      
-      grid.innerHTML = filteredProducts.map(product => `
-        <div class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-          <img src="${product.image}" class="w-full h-48 object-cover" alt="${product.name}">
-          <div class="p-4">
-            <h5 class="font-semibold text-lg mb-2">${product.name}</h5>
-            <p class="text-gray-600 text-sm mb-3">${product.description}</p>
-            <div class="flex justify-between items-center mb-3">
-              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${product.category}</span>
-              <span class="text-green-600 font-bold text-lg">${product.price}</span>
-            </div>
-            <div class="flex gap-2">
-              <button 
-                class="flex-1 bg-blue-600 text-white py-2 px-3 rounded hover:bg-blue-700 transition-colors text-sm"
-                onclick="showProductInfo(${product.id})">
-                <i class="fas fa-info-circle mr-1"></i>Info
-              </button>
-              <button 
-                class="flex-1 bg-green-600 text-white py-2 px-3 rounded hover:bg-green-700 transition-colors text-sm"
-                onclick="addToCart(${product.id})"
-                ${product.quantityInStock <= 0 ? 'disabled' : ''}>
-                <i class="fas fa-cart-plus mr-1"></i>Add
-              </button>
-            </div>
-            ${product.quantityInStock <= 0 ? '<p class="text-red-500 text-xs mt-2">Out of Stock</p>' : ''}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // Payment method selection
+    // Event listeners
     document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('.payment-method').forEach(method => {
-        method.addEventListener('click', function() {
-          document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-          this.classList.add('selected');
+      console.log('DOM loaded, initializing...');
+      
+      // Checkout form submission
+      const checkoutForm = document.getElementById('checkoutForm');
+      if (checkoutForm) {
+        checkoutForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
           
-          const cardDetails = document.getElementById('cardDetails');
-          if (cardDetails) {
-            cardDetails.style.display = this.dataset.method === 'card' ? 'block' : 'none';
+          const submitBtn = e.target.querySelector('button[type="submit"]');
+          const originalText = submitBtn.innerHTML;
+          
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+          submitBtn.disabled = true;
+          
+          try {
+            await processPayment();
+          } catch (error) {
+            console.error('Checkout failed:', error);
+          } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
           }
         });
-      });
+      }
 
       // Modal add to cart button
       const modalAddToCart = document.getElementById('modalAddToCart');
       if (modalAddToCart) {
         modalAddToCart.addEventListener('click', function() {
-          if (currentProduct) {
+          if (currentProduct && currentProduct.quantityInStock > 0) {
             addToCart(currentProduct.id);
             closeModal('productModal');
           }
@@ -1220,127 +1137,6 @@
       // Initialize the app
       initApp();
     });
-
-    // Edit profile functionality
-    async function editProfile() {
-      const name = prompt('Enter your name:', user.name);
-      const email = prompt('Enter your email:', user.email);
-      const phone = prompt('Enter your phone:', user.phone || '');
-      
-      if (name && email) {
-        try {
-          const response = await fetch('/api/user', {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest',
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            },
-            body: JSON.stringify({
-              customerName: name,
-              email: email,
-              contactNumber: phone
-            })
-          });
-
-          if (!response.ok) throw new Error('Failed to update profile');
-          
-          const result = await response.json();
-          
-          // Update local user object
-          user.name = name;
-          user.email = email;
-          user.phone = phone;
-          
-          updateUserDisplay();
-          alert('Profile updated successfully!');
-          
-        } catch (error) {
-          console.error('Failed to update profile:', error);
-          alert('Failed to update profile. Please try again.');
-        }
-      }
-    }
-
-    //Mount Card element
-    document.addEventListener('DOMContentLoaded', function() {
-      if (document.getElementById('card-element')) {
-        cardElement.mount('#card-element');
-        
-        // Handle real-time validation errors from the card Element
-        cardElement.on('change', function(event) {
-          const displayError = document.getElementById('card-errors');
-          if (event.error) {
-            displayError.textContent = event.error.message;
-          } else {
-            displayError.textContent = '';
-          }
-        });
-      }
-    });
-
-    // Updated process payment function with real Stripe integration
-    async function processPaymentWithStripe() {
-      try {
-        const paymentData = await createPaymentIntent();
-        
-        const shippingAddress = {
-          name: document.getElementById('fullName').value,
-          email: document.getElementById('email').value,
-          address: document.getElementById('address').value
-        };
-
-        // Confirm payment with Stripe
-        const {error, paymentIntent} = await stripe.confirmCardPayment(paymentData.client_secret, {
-          payment_method: {
-            card: cardElement,
-            billing_details: {
-              name: shippingAddress.name,
-              email: shippingAddress.email,
-            }
-          }
-        });
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        if (paymentIntent.status === 'succeeded') {
-          // Confirm with backend
-          const response = await fetch('/api/payment/confirm', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest',
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            },
-            body: JSON.stringify({
-              payment_intent_id: paymentIntent.id,
-              shipping_address: shippingAddress
-            })
-          });
-
-          if (!response.ok) throw new Error('Failed to confirm order');
-          
-          const result = await response.json();
-          
-          // Clear cart and show success
-          cart = [];
-          updateCartBadge();
-          updateCartDisplay();
-          closeOffcanvas('checkoutOffcanvas');
-          
-          alert('Order placed successfully! Thank you for your purchase.');
-          
-          return result;
-        }
-        
-      } catch (error) {
-        console.error('Payment failed:', error);
-        alert('Payment failed: ' + error.message);
-        throw error;
-      }
-    }
   </script>
 
 </body>

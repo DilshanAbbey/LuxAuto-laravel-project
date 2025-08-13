@@ -18,6 +18,11 @@ class Cart extends Model
 
     protected $appends = ['total'];
 
+    protected $casts = [
+        'price' => 'decimal:2',
+        'quantity' => 'integer'
+    ];
+    
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -25,7 +30,7 @@ class Cart extends Model
 
     public function part()
     {
-        return $this->belongsTo(Part::class, 'part_id', 'id');
+        return $this->belongsTo(Part::class, 'part_id', 'idPart');
     }
 
     public function getTotalAttribute()

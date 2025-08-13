@@ -15,7 +15,7 @@ return new class extends Migration
         // Create proper carts table
         Schema::create('cart', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('part_id')->constrained('parts', 'idPart')->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('totalprice', 10, 2);

@@ -64,6 +64,7 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::delete('/api/cart/{cart}', [App\Http\Controllers\CartController::class, 'destroy']);
     
     // User profile routes
+    Route::get('/api/products', [App\Http\Controllers\ShopController::class, 'getProducts']);
     Route::get('/api/user', [App\Http\Controllers\Api\UserProfileController::class, 'show']);
     Route::put('/api/user', [App\Http\Controllers\Api\UserProfileController::class, 'update']);
     
