@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>LuxAuto - LuxParts</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.stripe.com/v3/"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   @vite('resources/css/app.css')
   <script>
@@ -308,7 +310,8 @@
 		Search
 	  </button>
 	</div>
-
+  <div>
+    <div>
       <!-- Product Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="productGrid">
         <!-- Products will be loaded from database -->
@@ -423,10 +426,16 @@
           </div>
           <h5 class="mt-3 mb-1 font-semibold" id="userName">Loading...</h5>
           <p class="text-gray-600" id="userType">Loading...</p>
+          <p class="text-gray-500 text-sm" id="userEmail"></p>
+          <p class="text-gray-500 text-sm" id="userPhone"></p>
         </div>
       </div>
       
       <div class="space-y-1">
+        <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded" onclick="editProfile()">
+          <i class="fas fa-edit mr-3 text-gray-600"></i>
+          <span>Edit Profile</span>
+        </a>
         <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded">
           <i class="fas fa-box mr-3 text-gray-600"></i>
           <span>My Orders</span>
@@ -443,14 +452,13 @@
           <i class="fas fa-credit-card mr-3 text-gray-600"></i>
           <span>Payment Methods</span>
         </a>
-        <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded">
-          <i class="fas fa-edit mr-3 text-gray-600"></i>
-          <span>Edit Profile</span>
-        </a>
-        <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded text-red-600">
-          <i class="fas fa-sign-out-alt mr-3"></i>
-          <span>Logout</span>
-        </a>
+        <form method="POST" action="{{ route('logout') }}" class="block">
+          @csrf
+          <button type="submit" class="w-full text-left flex items-center p-3 hover:bg-gray-50 rounded text-red-600">
+            <i class="fas fa-sign-out-alt mr-3"></i>
+            <span>Logout</span>
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -494,18 +502,11 @@
         
         <div id="cardDetails" class="mb-3">
           <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-            <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="cardNumber" required>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-              <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="expiry" placeholder="MM/YY" required>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Card Information</label>
+            <div id="card-element" class="w-full p-3 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+              <!-- Stripe Elements will create form elements here -->
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-              <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="cvv" required>
-            </div>
+            <div id="card-errors" role="alert" class="text-red-600 text-sm mt-1"></div>
           </div>
         </div>
         
@@ -560,13 +561,31 @@
     let currentProduct = null;
     let products = [];
     let user = null;
+    let stripeClientSecret = null;
+
+    // Initialize Stripe
+    const stripe = Stripe('{{ config("payment.stripe.public_key") }}');
+    const elements = stripe.elements();
+
+    const cardElement = elements.create('card', {
+      style: {
+        base: {
+          fontSize: '16px',
+          color: '#424770',
+          '::placeholder': {
+            color: '#aab7c4',
+          },
+        },
+      },
+    });
 
     // Initialize the application
     async function initApp() {
       try {
         await Promise.all([
           loadProducts(),
-          loadUserInfo()
+          loadUserInfo(),
+          loadCart()
         ]);
         updateCartBadge();
         updateCartDisplay();
@@ -576,51 +595,197 @@
       }
     }
 
-    // Load products from da
+    // Load products from database
     async function loadProducts() {
       try {
         const response = await fetch('/api/products');
         if (!response.ok) throw new Error('Failed to fetch products');
         
-        const products = await response.json();
+        const parts = await response.json();
         
         // Transform parts data to match expected format
-        this.products = products.map(part => ({
-            id: part.id,
-            name: part.partName,
-            price: parseFloat(part.price),
-            image: `https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=220&fit=crop&auto=format&q=80&seed=${part.id}`,
-            description: part.description,
-            features: ["High Quality", "OEM Compatible", "Warranty Included", "Fast Shipping"],
-            category: part.brand
+        products = parts.map(part => ({
+          id: part.id,
+          name: part.partName,
+          price: parseFloat(part.price),
+          image: `https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=220&fit=crop&auto=format&q=80&seed=${part.id}`,
+          description: part.description,
+          features: ["High Quality", "OEM Compatible", "Warranty Included", "Fast Shipping"],
+          category: part.brand,
+          partNumber: part.partNumber,
+          model: part.model,
+          quantityInStock: part.quantityInStock
         }));
         
         renderProducts();
       } catch (error) {
-          console.error('Failed to load products:', error);
-          // Keep existing fallback products
-          showFallbackProducts();
+        console.error('Failed to load products:', error);
+        showFallbackProducts();
       }
     }
 
     // Load user information from API
     async function loadUserInfo() {
       try {
-        // Simulate API call - replace with actual Laravel API endpoint
-        const response = await fetch('/api/user');
+        const response = await fetch('/api/user', {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+          }
+        });
+        
         if (!response.ok) throw new Error('Failed to fetch user info');
         
         user = await response.json();
         updateUserDisplay();
       } catch (error) {
         console.error('Failed to load user info:', error);
-        // Fallback to mock data for demo
         user = {
-          name: "John Doe",
-          email: "john.doe@example.com",
-          type: "Premium Member"
+          name: "Guest User",
+          email: "guest@example.com",
+          type: "Customer"
         };
         updateUserDisplay();
+      }
+    }
+
+    // Load cart from database
+    async function loadCart() {
+      try {
+        const response = await fetch('/api/cart', {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+          }
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch cart');
+        
+        const cartItems = await response.json();
+        cart = cartItems.map(item => ({
+          id: item.part.id,
+          name: item.part.partName,
+          price: parseFloat(item.part.price),
+          image: `https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=220&fit=crop&auto=format&q=80&seed=${item.part.id}`,
+          quantity: item.quantity,
+          category: item.part.brand
+        }));
+        
+      } catch (error) {
+        console.error('Failed to load cart:', error);
+        cart = [];
+      }
+    }
+
+    // Add product to cart
+    async function addToCart(productId) {
+      try {
+        const response = await fetch('/api/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+          },
+          body: JSON.stringify({
+            part_id: productId,
+            quantity: 1
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to add to cart');
+        
+        await loadCart();
+        updateCartBadge();
+        updateCartDisplay();
+        
+        // Show success animation
+        const button = event.target.closest('button');
+        button.classList.add('success-animation');
+        setTimeout(() => button.classList.remove('success-animation'), 600);
+        
+      } catch (error) {
+        console.error('Failed to add to cart:', error);
+        alert('Failed to add item to cart');
+      }
+    }
+
+    // Update quantity
+    async function updateQuantity(productId, change) {
+      const item = cart.find(item => item.id === productId);
+      if (!item) return;
+      
+      const newQuantity = item.quantity + change;
+      
+      if (newQuantity <= 0) {
+        await removeFromCart(productId);
+        return;
+      }
+      
+      try {
+        const cartItem = await findCartItem(productId);
+        if (!cartItem) return;
+        
+        const response = await fetch(`/api/cart/${cartItem.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+          },
+          body: JSON.stringify({
+            quantity: newQuantity
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to update quantity');
+        
+        await loadCart();
+        updateCartBadge();
+        updateCartDisplay();
+        
+      } catch (error) {
+        console.error('Failed to update quantity:', error);
+        alert('Failed to update item quantity');
+      }
+    }
+
+    // Remove from cart
+    async function removeFromCart(productId) {
+      try {
+        const cartItem = await findCartItem(productId);
+        if (!cartItem) return;
+        
+        const response = await fetch(`/api/cart/${cartItem.id}`, {
+          method: 'DELETE',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+          }
+        });
+
+        if (!response.ok) throw new Error('Failed to remove from cart');
+        
+        await loadCart();
+        updateCartBadge();
+        updateCartDisplay();
+        
+      } catch (error) {
+        console.error('Failed to remove from cart:', error);
+        alert('Failed to remove item from cart');
+      }
+    }
+
+    // Helper function to find cart item
+    async function findCartItem(productId) {
+      try {
+        const response = await fetch('/api/cart');
+        const cartItems = await response.json();
+        return cartItems.find(item => item.part.id === productId);
+      } catch (error) {
+        console.error('Failed to find cart item:', error);
+        return null;
       }
     }
 
@@ -635,30 +800,40 @@
     // Render products
     function renderProducts() {
       const grid = document.getElementById('productGrid');
+      if (!products.length) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-10">
+            <i class="fas fa-box-open text-6xl text-gray-400 mb-4"></i>
+            <p class="text-gray-600 text-lg">No products available</p>
+          </div>
+        `;
+        return;
+      }
+
       grid.innerHTML = products.map(product => `
-        <div class="col-lg-3 col-md-5 fade-in">
-          <div class="card product-card h-100 shadow-sm">
-            <img src="${product.image}" class="product-image" alt="${product.name}">
-            <div class="card-body">
-              <div class="product-info">
-                <h5 class="card-title">${product.name}</h5>
-                <p class="card-text text-muted">${product.description}</p>
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <span class="badge bg-secondary">${product.category}</span>
-                  <h5 class="text-success mb-0">$${product.price}</h5>
-                </div>
-              </div>
-              <div class="product-actions">
-                <div class="btn-group w-100" role="group">
-                  <button class="btn btn-outline-primary" onclick="showProductInfo(${product.id})">
-                    <i class="fas fa-info-circle me-1"></i>More Info
-                  </button>
-                  <button class="btn btn-primary" onclick="addToCart(${product.id})">
-                    <i class="fas fa-cart-plus me-1"></i>Add to Cart
-                  </button>
-                </div>
-              </div>
+        <div class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+          <img src="${product.image}" class="w-full h-48 object-cover" alt="${product.name}">
+          <div class="p-4">
+            <h5 class="font-semibold text-lg mb-2">${product.name}</h5>
+            <p class="text-gray-600 text-sm mb-3">${product.description}</p>
+            <div class="flex justify-between items-center mb-3">
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${product.category}</span>
+              <span class="text-green-600 font-bold text-lg">$${product.price}</span>
             </div>
+            <div class="flex gap-2">
+              <button 
+                class="flex-1 bg-blue-600 text-white py-2 px-3 rounded hover:bg-blue-700 transition-colors text-sm"
+                onclick="showProductInfo(${product.id})">
+                <i class="fas fa-info-circle mr-1"></i>Info
+              </button>
+              <button 
+                class="flex-1 bg-green-600 text-white py-2 px-3 rounded hover:bg-green-700 transition-colors text-sm"
+                onclick="addToCart(${product.id})"
+                ${product.quantityInStock <= 0 ? 'disabled' : ''}>
+                <i class="fas fa-cart-plus mr-1"></i>Add
+              </button>
+            </div>
+            ${product.quantityInStock <= 0 ? '<p class="text-red-500 text-xs mt-2">Out of Stock</p>' : ''}
           </div>
         </div>
       `).join('');
@@ -671,43 +846,31 @@
       
       document.getElementById('modalTitle').textContent = product.name;
       document.getElementById('modalBody').innerHTML = `
-        <div class="row">
-          <div class="col-md-6">
-            <img src="${product.image}" class="img-fluid rounded" alt="${product.name}">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <img src="${product.image}" class="w-full rounded-lg" alt="${product.name}">
           </div>
-          <div class="col-md-6">
-            <h4 class="text-success mb-3">$${product.price}</h4>
-            <p class="mb-3">${product.description}</p>
-            <h6>Key Features:</h6>
-            <ul class="list-unstyled">
-              ${product.features.map(feature => `<li><i class="fas fa-check text-success me-2"></i>${feature}</li>`).join('')}
+          <div>
+            <h4 class="text-2xl font-bold text-green-600 mb-3">$${product.price}</h4>
+            <p class="mb-4">${product.description}</p>
+            <div class="mb-4">
+              <h6 class="font-semibold mb-2">Details:</h6>
+              <ul class="space-y-1">
+                <li><strong>Part Number:</strong> ${product.partNumber}</li>
+                <li><strong>Brand:</strong> ${product.category}</li>
+                <li><strong>Model:</strong> ${product.model}</li>
+                <li><strong>Stock:</strong> ${product.quantityInStock} units</li>
+              </ul>
+            </div>
+            <h6 class="font-semibold mb-2">Key Features:</h6>
+            <ul class="space-y-1">
+              ${product.features.map(feature => `<li><i class="fas fa-check text-green-500 mr-2"></i>${feature}</li>`).join('')}
             </ul>
-            <div class="badge bg-secondary">${product.category}</div>
           </div>
         </div>
       `;
       
-      new bootstrap.Modal(document.getElementById('productModal')).show();
-    }
-
-    // Add product to cart
-    function addToCart(productId) {
-      const product = products.find(p => p.id === productId);
-      const existingItem = cart.find(item => item.id === productId);
-      
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        cart.push({ ...product, quantity: 1 });
-      }
-      
-      updateCartBadge();
-      updateCartDisplay();
-      
-      // Show success animation
-      const button = event.target.closest('button');
-      button.classList.add('success-animation');
-      setTimeout(() => button.classList.remove('success-animation'), 600);
+      showModal('productModal');
     }
 
     // Update cart badge
@@ -723,32 +886,28 @@
       
       if (cart.length === 0) {
         cartItems.innerHTML = `
-          <div class="text-center py-5">
-            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-            <p class="text-muted">Your cart is empty</p>
+          <div class="text-center py-8">
+            <i class="fas fa-shopping-cart text-4xl text-gray-400 mb-3"></i>
+            <p class="text-gray-600">Your cart is empty</p>
           </div>
         `;
-        checkoutSummary.style.display = 'none';
+        checkoutSummary.classList.add('hidden');
         return;
       }
       
       cartItems.innerHTML = cart.map(item => `
-        <div class="cart-item">
-          <div class="row align-items-center">
-            <div class="col-3">
-              <img src="${item.image}" class="img-fluid rounded" alt="${item.name}">
+        <div class="border-b pb-4 mb-4">
+          <div class="flex items-center gap-3">
+            <img src="${item.image}" class="w-16 h-16 object-cover rounded" alt="${item.name}">
+            <div class="flex-1">
+              <h6 class="font-semibold">${item.name}</h6>
+              <p class="text-gray-600 text-sm">$${item.price.toFixed(2)} each</p>
             </div>
-            <div class="col-6">
-              <h6 class="mb-1">${item.name}</h6>
-              <small class="text-muted">$${item.price}</small>
-            </div>
-            <div class="col-3">
-              <div class="quantity-controls">
-                <div class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</div>
-                <span>${item.quantity}</span>
-                <div class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</div>
-              </div>
-              <button class="btn btn-sm btn-outline-danger mt-2" onclick="removeFromCart(${item.id})">
+            <div class="flex items-center gap-2">
+              <button class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded flex items-center justify-center" onclick="updateQuantity(${item.id}, -1)">-</button>
+              <span class="w-8 text-center">${item.quantity}</span>
+              <button class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded flex items-center justify-center" onclick="updateQuantity(${item.id}, 1)">+</button>
+              <button class="text-red-500 hover:text-red-700 ml-2" onclick="removeFromCart(${item.id})">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -757,28 +916,7 @@
       `).join('');
       
       updateCartSummary();
-      checkoutSummary.style.display = 'block';
-    }
-
-    // Update quantity
-    function updateQuantity(productId, change) {
-      const item = cart.find(item => item.id === productId);
-      if (item) {
-        item.quantity += change;
-        if (item.quantity <= 0) {
-          removeFromCart(productId);
-        } else {
-          updateCartBadge();
-          updateCartDisplay();
-        }
-      }
-    }
-
-    // Remove from cart
-    function removeFromCart(productId) {
-      cart = cart.filter(item => item.id !== productId);
-      updateCartBadge();
-      updateCartDisplay();
+      checkoutSummary.classList.remove('hidden');
     }
 
     // Update cart summary
@@ -793,52 +931,416 @@
       document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
     }
 
-    // Payment method selection
-    document.querySelectorAll('.payment-method').forEach(method => {
-      method.addEventListener('click', function() {
-        document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-        this.classList.add('selected');
-        
-        const cardDetails = document.getElementById('cardDetails');
-        cardDetails.style.display = this.dataset.method === 'card' ? 'block' : 'none';
-      });
-    });
+    // Show checkout
+    async function showCheckout() {
+      if (cart.length === 0) {
+        alert('Your cart is empty');
+        return;
+      }
 
-    // Checkout form submission
-    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+      closeOffcanvas('cartOffcanvas');
+      toggleOffcanvas('checkoutOffcanvas');
       
-      // Simulate payment processing
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
-      
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
-      submitBtn.disabled = true;
-      
-      setTimeout(() => {
-        alert('Order placed successfully! Thank you for your purchase.');
+      // Pre-populate user information
+      if (user) {
+        document.getElementById('fullName').value = user.name || '';
+        document.getElementById('email').value = user.email || '';
+      }
+    }
+
+    // Create payment intent
+    async function createPaymentIntent() {
+      try {
+        const shippingAddress = {
+          name: document.getElementById('fullName').value,
+          email: document.getElementById('email').value,
+          address: document.getElementById('address').value
+        };
+
+        const response = await fetch('/api/payment/intent', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+          },
+          body: JSON.stringify({ shipping_address: shippingAddress })
+        });
+
+        if (!response.ok) throw new Error('Failed to create payment intent');
+        
+        const data = await response.json();
+        stripeClientSecret = data.client_secret;
+        return data;
+        
+      } catch (error) {
+        console.error('Failed to create payment intent:', error);
+        throw error;
+      }
+    }
+
+    // Process payment (simplified for demo)
+    async function processPayment() {
+      try {
+        const paymentData = await createPaymentIntent();
+        
+        // In a real implementation, you would use Stripe Elements here
+        // For demo purposes, we'll simulate a successful payment
+        const shippingAddress = {
+          name: document.getElementById('fullName').value,
+          email: document.getElementById('email').value,
+          address: document.getElementById('address').value
+        };
+
+        const response = await fetch('/api/payment/confirm', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+          },
+          body: JSON.stringify({
+            payment_intent_id: 'demo_payment_' + Date.now(),
+            shipping_address: shippingAddress
+          })
+        });
+
+        if (!response.ok) throw new Error('Payment failed');
+        
+        const result = await response.json();
+        
+        // Clear cart and show success
         cart = [];
         updateCartBadge();
         updateCartDisplay();
-        bootstrap.Offcanvas.getInstance(document.getElementById('checkoutOffcanvas')).hide();
-        bootstrap.Offcanvas.getInstance(document.getElementById('cartOffcanvas')).hide();
+        closeOffcanvas('checkoutOffcanvas');
         
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        this.reset();
-      }, 2000);
-    });
+        alert('Order placed successfully! Thank you for your purchase.');
+        
+        return result;
+        
+      } catch (error) {
+        console.error('Payment failed:', error);
+        alert('Payment failed. Please try again.');
+        throw error;
+      }
+    }
 
-    // Modal add to cart
-    document.getElementById('modalAddToCart').addEventListener('click', function() {
-      if (currentProduct) {
-        addToCart(currentProduct.id);
-        bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+    // Checkout form submission
+    document.addEventListener('DOMContentLoaded', function() {
+      const checkoutForm = document.getElementById('checkoutForm');
+      if (checkoutForm) {
+        checkoutForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const submitBtn = e.target.querySelector('button[type="submit"]');
+          const originalText = submitBtn.innerHTML;
+          
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+          submitBtn.disabled = true;
+          
+          try {
+            await processPayment();
+          } catch (error) {
+            console.error('Checkout failed:', error);
+          } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+          }
+        });
       }
     });
 
-    // Initialize shop when page loads
-    document.addEventListener('DOMContentLoaded', initShop);
+    // Utility functions
+    function toggleOffcanvas(id) {
+      const offcanvas = document.getElementById(id);
+      const backdrop = document.getElementById('offcanvasBackdrop');
+      
+      offcanvas.classList.toggle('show');
+      backdrop.classList.toggle('show');
+    }
+
+    function closeOffcanvas(id) {
+      const offcanvas = document.getElementById(id);
+      const backdrop = document.getElementById('offcanvasBackdrop');
+      
+      offcanvas.classList.remove('show');
+      backdrop.classList.remove('show');
+    }
+
+    function closeAllOffcanvas() {
+      document.querySelectorAll('.offcanvas').forEach(offcanvas => {
+        offcanvas.classList.remove('show');
+      });
+      document.getElementById('offcanvasBackdrop').classList.remove('show');
+    }
+
+    function showModal(id) {
+      document.getElementById(id).classList.add('show');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    function toggleMobileMenu() {
+      const mobileMenu = document.querySelector('.mobile-menu');
+      mobileMenu.classList.toggle('active');
+    }
+
+    function showError(message) {
+      alert(message); // In production, use a proper toast/notification system
+    }
+
+    function showFallbackProducts() {
+      // Fallback products for demo
+      products = [
+        {
+          id: 1,
+          name: "Brake Pad Set",
+          price: 45.99,
+          image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=220&fit=crop&auto=format&q=80",
+          description: "High-performance brake pads for optimal stopping power",
+          features: ["High Quality", "OEM Compatible", "Warranty Included", "Fast Shipping"],
+          category: "Bosch",
+          partNumber: "BP001",
+          model: "Universal",
+          quantityInStock: 15
+        },
+        {
+          id: 2,
+          name: "Air Filter",
+          price: 19.99,
+          image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=300&h=220&fit=crop&auto=format&q=80",
+          description: "Premium air filter for enhanced engine performance",
+          features: ["High Quality", "OEM Compatible", "Warranty Included", "Fast Shipping"],
+          category: "K&N",
+          partNumber: "AF002",
+          model: "Universal",
+          quantityInStock: 23
+        }
+      ];
+      renderProducts();
+    }
+
+    function filterProducts() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      if (!searchTerm) {
+        renderProducts();
+        return;
+      }
+      
+      const filteredProducts = products.filter(product => 
+        product.name.toLowerCase().includes(searchTerm) ||
+        product.description.toLowerCase().includes(searchTerm) ||
+        product.category.toLowerCase().includes(searchTerm) ||
+        product.partNumber.toLowerCase().includes(searchTerm)
+      );
+      
+      const grid = document.getElementById('productGrid');
+      if (filteredProducts.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-10">
+            <i class="fas fa-search text-6xl text-gray-400 mb-4"></i>
+            <p class="text-gray-600 text-lg">No products found matching "${searchTerm}"</p>
+            <button onclick="document.getElementById('searchInput').value=''; filterProducts();" 
+                    class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              Clear Search
+            </button>
+          </div>
+        `;
+        return;
+      }
+      
+      grid.innerHTML = filteredProducts.map(product => `
+        <div class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+          <img src="${product.image}" class="w-full h-48 object-cover" alt="${product.name}">
+          <div class="p-4">
+            <h5 class="font-semibold text-lg mb-2">${product.name}</h5>
+            <p class="text-gray-600 text-sm mb-3">${product.description}</p>
+            <div class="flex justify-between items-center mb-3">
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${product.category}</span>
+              <span class="text-green-600 font-bold text-lg">${product.price}</span>
+            </div>
+            <div class="flex gap-2">
+              <button 
+                class="flex-1 bg-blue-600 text-white py-2 px-3 rounded hover:bg-blue-700 transition-colors text-sm"
+                onclick="showProductInfo(${product.id})">
+                <i class="fas fa-info-circle mr-1"></i>Info
+              </button>
+              <button 
+                class="flex-1 bg-green-600 text-white py-2 px-3 rounded hover:bg-green-700 transition-colors text-sm"
+                onclick="addToCart(${product.id})"
+                ${product.quantityInStock <= 0 ? 'disabled' : ''}>
+                <i class="fas fa-cart-plus mr-1"></i>Add
+              </button>
+            </div>
+            ${product.quantityInStock <= 0 ? '<p class="text-red-500 text-xs mt-2">Out of Stock</p>' : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Payment method selection
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.payment-method').forEach(method => {
+        method.addEventListener('click', function() {
+          document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+          this.classList.add('selected');
+          
+          const cardDetails = document.getElementById('cardDetails');
+          if (cardDetails) {
+            cardDetails.style.display = this.dataset.method === 'card' ? 'block' : 'none';
+          }
+        });
+      });
+
+      // Modal add to cart button
+      const modalAddToCart = document.getElementById('modalAddToCart');
+      if (modalAddToCart) {
+        modalAddToCart.addEventListener('click', function() {
+          if (currentProduct) {
+            addToCart(currentProduct.id);
+            closeModal('productModal');
+          }
+        });
+      }
+
+      // Search on Enter key
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            filterProducts();
+          }
+        });
+      }
+
+      // Initialize the app
+      initApp();
+    });
+
+    // Edit profile functionality
+    async function editProfile() {
+      const name = prompt('Enter your name:', user.name);
+      const email = prompt('Enter your email:', user.email);
+      const phone = prompt('Enter your phone:', user.phone || '');
+      
+      if (name && email) {
+        try {
+          const response = await fetch('/api/user', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify({
+              customerName: name,
+              email: email,
+              contactNumber: phone
+            })
+          });
+
+          if (!response.ok) throw new Error('Failed to update profile');
+          
+          const result = await response.json();
+          
+          // Update local user object
+          user.name = name;
+          user.email = email;
+          user.phone = phone;
+          
+          updateUserDisplay();
+          alert('Profile updated successfully!');
+          
+        } catch (error) {
+          console.error('Failed to update profile:', error);
+          alert('Failed to update profile. Please try again.');
+        }
+      }
+    }
+
+    //Mount Card element
+    document.addEventListener('DOMContentLoaded', function() {
+      if (document.getElementById('card-element')) {
+        cardElement.mount('#card-element');
+        
+        // Handle real-time validation errors from the card Element
+        cardElement.on('change', function(event) {
+          const displayError = document.getElementById('card-errors');
+          if (event.error) {
+            displayError.textContent = event.error.message;
+          } else {
+            displayError.textContent = '';
+          }
+        });
+      }
+    });
+
+    // Updated process payment function with real Stripe integration
+    async function processPaymentWithStripe() {
+      try {
+        const paymentData = await createPaymentIntent();
+        
+        const shippingAddress = {
+          name: document.getElementById('fullName').value,
+          email: document.getElementById('email').value,
+          address: document.getElementById('address').value
+        };
+
+        // Confirm payment with Stripe
+        const {error, paymentIntent} = await stripe.confirmCardPayment(paymentData.client_secret, {
+          payment_method: {
+            card: cardElement,
+            billing_details: {
+              name: shippingAddress.name,
+              email: shippingAddress.email,
+            }
+          }
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        if (paymentIntent.status === 'succeeded') {
+          // Confirm with backend
+          const response = await fetch('/api/payment/confirm', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify({
+              payment_intent_id: paymentIntent.id,
+              shipping_address: shippingAddress
+            })
+          });
+
+          if (!response.ok) throw new Error('Failed to confirm order');
+          
+          const result = await response.json();
+          
+          // Clear cart and show success
+          cart = [];
+          updateCartBadge();
+          updateCartDisplay();
+          closeOffcanvas('checkoutOffcanvas');
+          
+          alert('Order placed successfully! Thank you for your purchase.');
+          
+          return result;
+        }
+        
+      } catch (error) {
+        console.error('Payment failed:', error);
+        alert('Payment failed: ' + error.message);
+        throw error;
+      }
+    }
   </script>
 
 </body>

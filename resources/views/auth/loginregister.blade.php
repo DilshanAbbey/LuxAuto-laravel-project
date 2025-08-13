@@ -388,10 +388,20 @@
         </form>
 
         <!-- Register Form -->
-        <form class="auth-form hidden" id="registerForm" method="POST" action="/register">
+        <form class="auth-form hidden" id="registerForm" method="POST" action="{{ route('register') }}">
           @csrf
+          <input type="hidden" name="_token" value="{{ csrf_token() }}">
           <h2 class="text-center mb-6 text-blue-500 text-2xl font-semibold">Create Account</h2>
           
+          <!-- Display validation errors -->
+          @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
+              @endforeach
+            </div>
+          @endif
+
           <div class="flex flex-wrap -mx-2">
             <div class="w-full md:w-1/2 px-2">
               <div class="relative mb-6">
@@ -443,6 +453,9 @@
             <i class="fas fa-eye absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer transition-colors duration-300 hover:text-accent" id="confirmPasswordToggle"></i>
             <div class="validation-message text-sm mt-1 transition-all duration-300" id="confirmPasswordMsg"></div>
           </div>
+
+          <!-- Hidden field to set role as customer -->
+          <input type="hidden" name="role" value="customer">
 
           <div class="mb-4">
             <label class="flex items-start">

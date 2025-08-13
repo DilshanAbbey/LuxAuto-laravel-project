@@ -55,3 +55,19 @@ Route::middleware(['auth', 'role:administrator,employee,technician'])->prefix('d
     Route::apiResource('service-bookings', App\Http\Controllers\Api\ServiceBookingController::class);
     Route::apiResource('customer-chats', App\Http\Controllers\Api\CustomerChatController::class);
 });
+
+Route::middleware(['auth', 'role:customer'])->group(function () {
+    // Cart routes
+    Route::get('/api/cart', [App\Http\Controllers\CartController::class, 'index']);
+    Route::post('/api/cart', [App\Http\Controllers\CartController::class, 'store']);
+    Route::put('/api/cart/{cart}', [App\Http\Controllers\CartController::class, 'update']);
+    Route::delete('/api/cart/{cart}', [App\Http\Controllers\CartController::class, 'destroy']);
+    
+    // User profile routes
+    Route::get('/api/user', [App\Http\Controllers\Api\UserProfileController::class, 'show']);
+    Route::put('/api/user', [App\Http\Controllers\Api\UserProfileController::class, 'update']);
+    
+    // Payment routes
+    Route::post('/api/payment/intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent']);
+    Route::post('/api/payment/confirm', [App\Http\Controllers\PaymentController::class, 'confirmPayment']);
+});

@@ -11,7 +11,6 @@ class PartSeeder extends Seeder
     {
         $parts = [
             [
-                'idPart' => '001',
                 'partName' => 'Premium Brake Pad Set',
                 'partNumber' => 'BP001',
                 'brand' => 'LuxParts',
@@ -21,7 +20,6 @@ class PartSeeder extends Seeder
                 'quantityInStock' => 50
             ],
             [
-                'idPart' => '002',
                 'partName' => 'Oil Filter',
                 'partNumber' => 'OF002',
                 'brand' => 'LuxParts',

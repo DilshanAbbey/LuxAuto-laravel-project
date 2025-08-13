@@ -206,15 +206,28 @@
 
 			  <!-- Desktop navigation -->
 			  <ul class="desktop-nav flex space-x-1">
-				<li><a class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block" href="/loginregister"><span>Logout</span></a></li>
+				<li>
+					<form method="POST" action="{{ route('logout') }}" class="inline">
+						@csrf
+						<button type="submit" class="nav-link-hover px-6 py-2 rounded text-center min-w-[100px] mx-1 block bg-red-500 text-white hover:bg-red-600 transition-colors">
+							<span><i class="fas fa-sign-out-alt mr-2"></i>Logout</span>
+						</button>
+					</form>
+				</li>
 			  </ul>
-			</div>
 
 			<!-- Mobile navigation -->
 			<div class="mobile-menu mt-4">
-			  <ul class="flex flex-col space-y-2">
-				<li><a class="nav-link-hover px-6 py-2 rounded text-center block" href="/loginregister"><span>Logout</span></a></li>
-			  </ul>
+				<ul class="flex flex-col space-y-2">
+					<li>
+					<form method="POST" action="{{ route('logout') }}" class="inline">
+						@csrf
+						<button type="submit" class="nav-link-hover px-6 py-2 rounded text-center block w-full bg-red-500 text-white hover:bg-red-600 transition-colors">
+							<span><i class="fas fa-sign-out-alt mr-2"></i>Logout</span>
+						</button>
+					</form>
+					</li>
+				</ul>
 			</div>
 		  </div>
 		</nav>
