@@ -10,9 +10,25 @@ class CustomerDelivery extends Model
     use HasFactory;
 
     protected $fillable = [
-        'customer_id', 'address', 'city', 'zip_code'
+        'customer_id', 
+        'address', 
+        'city', 
+        'zip_code'
     ];
 
+    protected $casts = [
+        'zip_code' => 'string'
+    ];
+
+    public static function validationRules()
+    {
+        return [
+            'customer_id' => 'required|exists:customers,id',
+            'address',
+            'city',
+            'zip_code'
+        ];
+    }
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id');

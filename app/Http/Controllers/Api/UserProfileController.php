@@ -23,7 +23,6 @@ class UserProfileController extends Controller
                     'email' => $customer->email,
                     'phone' => $customer->contactNumber,
                     'username' => $customer->username,
-                    'password' > $customer->password,
                     'type' => 'Customer'
                 ]);
             }
@@ -66,6 +65,13 @@ class UserProfileController extends Controller
                     'customerName' => $request->customerName,
                     'email' => $request->email,
                     'contactNumber' => $request->contactNumber
+                ]);
+
+                // Update the corresponding user record
+                $user->update([
+                    'name' => $request->customerName,
+                    'email' => $request->email,
+                    'phone' => $request->contactNumber
                 ]);
 
                 return response()->json([

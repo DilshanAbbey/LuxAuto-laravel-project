@@ -76,4 +76,11 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     // Order routes
     Route::get('/api/orders', [App\Http\Controllers\Api\OrderController::class, 'index']);
     Route::get('/api/orders/{order}', [App\Http\Controllers\Api\OrderController::class, 'show']);
+
+    // Customer address routes
+    Route::get('/api/customer/addresses', [App\Http\Controllers\Api\CustomerAddressController::class, 'index']);
+    Route::post('/api/customer/addresses', [App\Http\Controllers\Api\CustomerAddressController::class, 'store']);
+    Route::put('/api/customer/addresses/{id}', [App\Http\Controllers\Api\CustomerAddressController::class, 'update']);
+    Route::delete('/api/customer/addresses/{id}', [App\Http\Controllers\Api\CustomerAddressController::class, 'destroy']);
+
 });

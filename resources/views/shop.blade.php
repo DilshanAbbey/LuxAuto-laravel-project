@@ -406,18 +406,18 @@
           <i class="fas fa-edit mr-3 text-gray-600"></i>
           <span>Edit Profile</span>
         </button>
-        <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded">
+        <button class="w-full text-left flex items-center p-3 hover:bg-gray-50 rounded" onclick="showMyOrders()">
           <i class="fas fa-box mr-3 text-gray-600"></i>
           <span>My Orders</span>
-        </a>
+        </button>
         <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded">
           <i class="fas fa-heart mr-3 text-gray-600"></i>
           <span>Wishlist</span>
         </a>
-        <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded">
+        <button class="w-full text-left flex items-center p-3 hover:bg-gray-50 rounded" onclick="loadUserAddresses().then(() => showAddresses())">
           <i class="fas fa-map-marker-alt mr-3 text-gray-600"></i>
           <span>Addresses</span>
-        </a>
+        </button>
         <form method="POST" action="{{ route('logout') }}" class="block">
           @csrf
           <button type="submit" class="w-full text-left flex items-center p-3 hover:bg-gray-50 rounded text-red-600">
@@ -437,48 +437,63 @@
         <i class="fas fa-times"></i>
       </button>
     </div>
-    <div class="p-4 overflow-y-auto">
-      <form id="checkoutForm">
-        <h6 class="font-semibold mb-3">Shipping Information</h6>
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-          <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="fullName" required>
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-          <input type="email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="email" required>
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Shipping Address</label>
-          <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24" id="address" required></textarea>
-        </div>
-        
-        <h6 class="font-semibold mb-3">Payment Method</h6>
-        <div class="flex flex-wrap gap-2 mb-3">
-          <div class="payment-method selected border-2 border-blue-600 bg-blue-50 rounded-lg p-3 cursor-pointer" data-method="demo">
-            <i class="fas fa-credit-card mr-2"></i>Demo Payment
+      <div class="p-4 overflow-y-auto">
+        <form id="checkoutForm">
+          <h6 class="font-semibold mb-3">Shipping Information</h6>
+          
+          <!-- Existing Addresses Dropdown -->
+          <div class="mb-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Select Existing Address</label>
+            <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="existingAddress" onchange="selectExistingAddress()">
+              <option value="">Select an existing address</option>
+            </select>
           </div>
-        </div>
-        
-        <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-5">
-          <div class="flex justify-between mb-2">
-            <span>Items:</span>
-            <span id="checkoutSubtotal">$0.00</span>
+          
+          <div class="text-center text-gray-500 text-sm mb-3">OR</div>
+          
+          <!-- New Address Fields -->
+          <div class="mb-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+            <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-20" id="address" placeholder="Enter your full street address" required></textarea>
           </div>
-          <div class="flex justify-between mb-2">
-            <span>Shipping:</span>
-            <span>$5.99</span>
+          
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="city" placeholder="City" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+              <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="zipCode" placeholder="ZIP Code" required>
+            </div>
           </div>
-          <div class="flex justify-between mb-3 border-t pt-2">
-            <strong>Total:</strong>
-            <strong id="checkoutTotal">$0.00</strong>
+          
+          <h6 class="font-semibold mb-3">Payment Method</h6>
+          <div class="flex flex-wrap gap-2 mb-3">
+            <div class="payment-method selected border-2 border-blue-600 bg-blue-50 rounded-lg p-3 cursor-pointer" data-method="stripe">
+              <i class="fas fa-credit-card mr-2"></i>Credit Card (Stripe)
+            </div>
           </div>
-          <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold">
-            <i class="fas fa-lock mr-2"></i>Complete Order
-          </button>
-        </div>
-      </form>
-    </div>
+          
+          <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-5">
+            <div class="flex justify-between mb-2">
+              <span>Items:</span>
+              <span id="checkoutSubtotal">$0.00</span>
+            </div>
+            <div class="flex justify-between mb-2">
+              <span>Shipping:</span>
+              <span>$5.99</span>
+            </div>
+            <div class="flex justify-between mb-3 border-t pt-2">
+              <strong>Total:</strong>
+              <strong id="checkoutTotal">$0.00</strong>
+            </div>
+            <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold">
+              <i class="fas fa-lock mr-2"></i>Complete Order
+            </button>
+          </div>
+        </form>
+      </div>
   </div>
 
   <!-- Product Info Modal -->
@@ -525,7 +540,8 @@
         await Promise.all([
           loadProducts(),
           loadUserInfo(),
-          loadCart()
+          loadCart(),
+          loadUserAddresses()
         ]);
         updateCartBadge();
         updateCartDisplay();
@@ -946,29 +962,89 @@
       }
     }
 
-    // Process payment (demo version)
+    // Updated process payment function
     async function processPayment() {
       try {
-        const shippingAddress = {
-          name: document.getElementById('fullName').value,
-          email: document.getElementById('email').value,
-          address: document.getElementById('address').value
+        const addressData = {
+          address: document.getElementById('address').value,
+          city: document.getElementById('city').value,
+          zip_code: document.getElementById('zipCode').value
         };
 
-        // Simulate payment processing
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Validate required fields
+        if (!addressData.address || !addressData.city || !addressData.zip_code) {
+          alert('Please fill in all shipping address fields');
+          return;
+        }
+
+        // Create payment intent
+        const response = await fetch('/api/payment/intent', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': getCSRFToken()
+          },
+          body: JSON.stringify(addressData)
+        });
+
+        const intentData = await response.json();
         
-        // Clear cart
+        if (!response.ok) {
+          throw new Error(intentData.error || 'Failed to create payment intent');
+        }
+
+        // For demo purposes - in production, you'd collect real card details
+        // Confirm payment with Stripe
+        const { error } = await stripe.confirmCardPayment(intentData.client_secret, {
+          payment_method: {
+            card: {
+              number: '4242424242424242',
+              exp_month: 12,
+              exp_year: 2025,
+              cvc: '123'
+            }
+          }
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        // Confirm the order
+        const confirmResponse = await fetch('/api/payment/confirm', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': getCSRFToken()
+          },
+          body: JSON.stringify({
+            payment_intent_id: intentData.client_secret.split('_secret_')[0],
+            ...addressData
+          })
+        });
+
+        const orderResult = await confirmResponse.json();
+        
+        if (!confirmResponse.ok) {
+          throw new Error(orderResult.error || 'Failed to confirm order');
+        }
+
+        // Success! Clear cart and show confirmation
         cart = [];
         updateCartBadge();
         updateCartDisplay();
         closeOffcanvas('checkoutOffcanvas');
         
-        alert('Order placed successfully! Thank you for your purchase.');
+        // Reload addresses to include the new one
+        await loadUserAddresses();
+        
+        alert(`Order placed successfully! Order number: ${orderResult.order.order_number}`);
         
       } catch (error) {
         console.error('Payment failed:', error);
-        alert('Payment failed. Please try again.');
+        alert('Payment failed: ' + error.message);
         throw error;
       }
     }
@@ -991,7 +1067,11 @@
       renderProducts();
     }
 
-    // Edit profile functionality
+    // Initialize Stripe
+    const stripe = Stripe('{{ config("payment.stripe.public_key") }}');
+    let paymentIntent = null;
+
+    // Edit profile functionality (Updated)
     async function editProfile() {
       if (!user) {
         alert('User information not available');
@@ -1005,8 +1085,7 @@
       if (!email || email.trim() === '') return;
 
       const phone = prompt('Enter your phone:', user.phone || '');
-      const username = prompt('Enter your phone:', user.phone || '');
-      const password = prompt('Enter your phone:', user.phone || '');
+      if (!phone || phone.trim() === '') return;
       
       try {
         const response = await fetch('/api/user', {
@@ -1019,10 +1098,7 @@
           body: JSON.stringify({
             customerName: name.trim(),
             email: email.trim(),
-            contactNumber: phone.trim(),
-            username: username.trim(),
-            password: password.trim()
-
+            contactNumber: phone.trim()
           })
         });
 
@@ -1133,6 +1209,254 @@
             filterProducts();
           }
         });
+      }      
+
+      // Global variables for addresses
+      let userAddresses = [];
+      let selectedAddressId = null;
+
+      // Load user addresses
+      async function loadUserAddresses() {
+        try {
+          const response = await fetch('/api/customer/addresses', {
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': getCSRFToken()
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          userAddresses = await response.json();
+          console.log('Addresses loaded:', userAddresses);
+          
+        } catch (error) {
+          console.error('Failed to load addresses:', error);
+          userAddresses = [];
+        }
+      }
+
+      // Show addresses in account offcanvas
+      function showAddresses() {
+        const addressesHTML = userAddresses.length > 0 ? 
+          userAddresses.map(address => `
+            <div class="bg-gray-50 rounded-lg p-3 mb-3 border">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <p class="font-medium">${address.address}</p>
+                  <p class="text-sm text-gray-600">${address.city}, ${address.zip_code}</p>
+                </div>
+                <div class="flex gap-2">
+                  <button class="text-blue-600 hover:text-blue-800 text-sm" onclick="editAddress(${address.id})">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="text-red-600 hover:text-red-800 text-sm" onclick="deleteAddress(${address.id})">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `).join('') :
+          '<p class="text-gray-500 text-center py-4">No addresses saved</p>';
+
+        // Update the account offcanvas to show addresses
+        const accountOffcanvas = document.getElementById('accountOffcanvas');
+        const addressesSection = `
+          <div id="addressesView" style="display: none;">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex justify-between items-center">
+              <h5 class="text-lg font-semibold">
+                <button onclick="showAccountMain()" class="mr-2 hover:text-gray-200">
+                  <i class="fas fa-arrow-left"></i>
+                </button>
+                My Addresses
+              </h5>
+              <button class="text-white hover:text-gray-200" onclick="closeOffcanvas('accountOffcanvas')">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="p-4">
+              <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors mb-4" onclick="addNewAddress()">
+                <i class="fas fa-plus mr-2"></i>Add New Address
+              </button>
+              <div id="addressesList">
+                ${addressesHTML}
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Add addresses section if it doesn't exist
+        if (!document.getElementById('addressesView')) {
+          accountOffcanvas.insertAdjacentHTML('beforeend', addressesSection);
+        } else {
+          document.getElementById('addressesList').innerHTML = addressesHTML;
+        }
+
+        // Hide main account view and show addresses
+        document.querySelector('#accountOffcanvas > div:nth-child(2)').style.display = 'none';
+        document.getElementById('addressesView').style.display = 'block';
+      }
+
+      // Show main account view
+      function showAccountMain() {
+        document.querySelector('#accountOffcanvas > div:nth-child(2)').style.display = 'block';
+        if (document.getElementById('addressesView')) {
+          document.getElementById('addressesView').style.display = 'none';
+        }
+      }
+
+      // Add new address
+      function addNewAddress() {
+        const address = prompt('Enter your address:');
+        if (!address || address.trim() === '') return;
+
+        const city = prompt('Enter your city:');
+        if (!city || city.trim() === '') return;
+
+        const zipCode = prompt('Enter your ZIP code:');
+        if (!zipCode || zipCode.trim() === '') return;
+
+        saveAddress({
+          address: address.trim(),
+          city: city.trim(),
+          zip_code: zipCode.trim()
+        });
+      }
+
+      // Edit address
+      function editAddress(addressId) {
+        const address = userAddresses.find(addr => addr.id === addressId);
+        if (!address) return;
+
+        const newAddress = prompt('Enter your address:', address.address);
+        if (!newAddress || newAddress.trim() === '') return;
+
+        const newCity = prompt('Enter your city:', address.city);
+        if (!newCity || newCity.trim() === '') return;
+
+        const newZipCode = prompt('Enter your ZIP code:', address.zip_code);
+        if (!newZipCode || newZipCode.trim() === '') return;
+
+        updateAddress(addressId, {
+          address: newAddress.trim(),
+          city: newCity.trim(),
+          zip_code: newZipCode.trim()
+        });
+      }
+
+      // Save new address
+      async function saveAddress(addressData) {
+        try {
+          const response = await fetch('/api/customer/addresses', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': getCSRFToken()
+            },
+            body: JSON.stringify(addressData)
+          });
+
+          const result = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(result.message || 'Failed to save address');
+          }
+          
+          await loadUserAddresses();
+          showAddresses();
+          alert('Address added successfully!');
+          
+        } catch (error) {
+          console.error('Failed to save address:', error);
+          alert('Failed to save address: ' + error.message);
+        }
+      }
+
+      // Update address
+      async function updateAddress(addressId, addressData) {
+        try {
+          const response = await fetch(`/api/customer/addresses/${addressId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': getCSRFToken()
+            },
+            body: JSON.stringify(addressData)
+          });
+
+          const result = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(result.message || 'Failed to update address');
+          }
+          
+          await loadUserAddresses();
+          showAddresses();
+          alert('Address updated successfully!');
+          
+        } catch (error) {
+          console.error('Failed to update address:', error);
+          alert('Failed to update address: ' + error.message);
+        }
+      }
+
+      // Delete address
+      async function deleteAddress(addressId) {
+        if (!confirm('Are you sure you want to delete this address?')) return;
+
+        try {
+          const response = await fetch(`/api/customer/addresses/${addressId}`, {
+            method: 'DELETE',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': getCSRFToken()
+            }
+          });
+
+          const result = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(result.message || 'Failed to delete address');
+          }
+          
+          await loadUserAddresses();
+          showAddresses();
+          alert('Address deleted successfully!');
+          
+        } catch (error) {
+          console.error('Failed to delete address:', error);
+          alert('Failed to delete address: ' + error.message);
+        }
+      }
+
+      // Load existing addresses in checkout
+      function loadAddressesInCheckout() {
+        const existingAddressSelect = document.getElementById('existingAddress');
+        if (!existingAddressSelect) return;
+
+        existingAddressSelect.innerHTML = '<option value="">Select an existing address</option>' +
+          userAddresses.map(address => 
+            `<option value="${address.id}" data-address="${address.address}" data-city="${address.city}" data-zip="${address.zip_code}">
+              ${address.address}, ${address.city}, ${address.zip_code}
+            </option>`
+          ).join('');
+      }
+
+      // Select existing address in checkout
+      function selectExistingAddress() {
+        const select = document.getElementById('existingAddress');
+        const selectedOption = select.options[select.selectedIndex];
+        
+        if (selectedOption.value) {
+          document.getElementById('address').value = selectedOption.dataset.address;
+          document.getElementById('city').value = selectedOption.dataset.city;
+          document.getElementById('zipCode').value = selectedOption.dataset.zip;
+          selectedAddressId = parseInt(selectedOption.value);
+        }
       }
 
       // Initialize the app

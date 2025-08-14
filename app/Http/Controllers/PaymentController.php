@@ -5,19 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\CustomerDelivery;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
     public function createPaymentIntent(Request $request)
     {
         $request->validate([
-            'shipping_address' => 'required|array',
-            'shipping_address.name' => 'required|string',
-            'shipping_address.email' => 'required|email',
-            'shipping_address.address' => 'required|string',
+            'address' => 'required|string|max:500',
+            'city' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:10',
         ]);
 
         Stripe::setApiKey(config('payment.stripe.secret_key'));
@@ -30,13 +33,16 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Cart is empty'], 400);
         }
 
-        $subtotal = $cartItems->sum('total');
-        $shipping = 5.99;
+        // Calculate totals
+        $subtotal = $cartItems->sum(function($item) {
+            return $item->quantity * $item->price;
+        });
+        $shipping = $subtotal > 100 ? 0 : 5.99; // Free shipping over $100
         $total = $subtotal + $shipping;
 
         try {
             $paymentIntent = PaymentIntent::create([
-                'amount' => $total * 100, // Amount in cents
+                'amount' => round($total * 100), // Amount in cents
                 'currency' => 'usd',
                 'metadata' => [
                     'user_id' => auth()->id(),
@@ -47,7 +53,9 @@ class PaymentController extends Controller
 
             return response()->json([
                 'client_secret' => $paymentIntent->client_secret,
-                'amount' => $total
+                'amount' => $total,
+                'subtotal' => $subtotal,
+                'shipping' => $shipping
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -58,50 +66,101 @@ class PaymentController extends Controller
     {
         $request->validate([
             'payment_intent_id' => 'required|string',
-            'shipping_address' => 'required|array'
+            'address' => 'required|string|max:500',
+            'city' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:10',
         ]);
 
-        $cartItems = Cart::with('part')
-            ->where('user_id', auth()->id())
-            ->get();
+        return DB::transaction(function () use ($request) {
+            $user = auth()->user();
+            $cartItems = Cart::with('part')
+                ->where('user_id', $user->id)
+                ->get();
 
-        $subtotal = $cartItems->sum('total');
-        $shipping = 5.99;
-        $total = $subtotal + $shipping;
+            if ($cartItems->isEmpty()) {
+                return response()->json(['error' => 'Cart is empty'], 400);
+            }
 
-        // Create order
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'order_number' => 'ORD-' . time(),
-            'subtotal' => $subtotal,
-            'shipping_cost' => $shipping,
-            'total_amount' => $total,
-            'status' => 'processing',
-            'shipping_address' => $request->shipping_address,
-            'payment_status' => 'paid',
-            'payment_gateway_id' => $request->payment_intent_id
-        ]);
+            // Get customer ID
+            $customer = Customer::where('id', $user->original_id)->first();
+            if (!$customer) {
+                return response()->json(['error' => 'Customer not found'], 404);
+            }
 
-        // Create order items
-        foreach ($cartItems as $cartItem) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'part_id' => $cartItem->part_id,
-                'quantity' => $cartItem->quantity,
-                'unit_price' => $cartItem->price,
-                'total_price' => $cartItem->quantity * $cartItem->price // Fix calculation
+            // Create or update customer delivery address
+            $customerDelivery = CustomerDelivery::updateOrCreate(
+                [
+                    'customer_id' => $customer->id,
+                    'address' => $request->address,
+                    'city' => $request->city,
+                    'zip_code' => $request->zip_code
+                ],
+                [
+                    'customer_id' => $customer->id,
+                    'address' => $request->address,
+                    'city' => $request->city,
+                    'zip_code' => $request->zip_code
+                ]
+            );
+
+            // Calculate totals
+            $subtotal = $cartItems->sum(function($item) {
+                return $item->quantity * $item->price;
+            });
+            $shipping = $subtotal > 100 ? 0 : 5.99;
+            $total = $subtotal + $shipping;
+
+            // Prepare shipping address for order
+            $shippingAddress = [
+                'address' => $request->address,
+                'city' => $request->city,
+                'zip_code' => $request->zip_code,
+                'customer_name' => $customer->customerName,
+                'customer_email' => $customer->email,
+                'delivery_id' => $customerDelivery->id
+            ];
+
+            // Create order
+            $order = Order::create([
+                'user_id' => $user->id,
+                'order_number' => 'ORD-' . time() . '-' . $user->id,
+                'subtotal' => $subtotal,
+                'shipping_cost' => $shipping,
+                'total_amount' => $total,
+                'status' => 'processing',
+                'shipping_address' => $shippingAddress,
+                'payment_status' => 'paid',
+                'payment_gateway_id' => $request->payment_intent_id
             ]);
 
-            // Update part inventory using the correct field
-            $cartItem->part->decrement('quantityInStock', $cartItem->quantity);
-        }
+            // Create order items and update inventory
+            foreach ($cartItems as $cartItem) {
+                // Check stock availability
+                if ($cartItem->part->quantityInStock < $cartItem->quantity) {
+                    throw new \Exception("Insufficient stock for {$cartItem->part->partName}");
+                }
 
-        // Clear cart
-        Cart::where('user_id', auth()->id())->delete();
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'part_id' => $cartItem->part_id,
+                    'quantity' => $cartItem->quantity,
+                    'unit_price' => $cartItem->price,
+                    'total_price' => $cartItem->quantity * $cartItem->price
+                ]);
 
-        return response()->json([
-            'success' => true,
-            'order' => $order->load('orderItems.part')
-        ]);
+                // Update part inventory
+                $cartItem->part->decrement('quantityInStock', $cartItem->quantity);
+            }
+
+            // Clear cart
+            Cart::where('user_id', $user->id)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order placed successfully',
+                'order' => $order->load('orderItems.part'),
+                'delivery_address' => $customerDelivery
+            ]);
+        });
     }
 }
