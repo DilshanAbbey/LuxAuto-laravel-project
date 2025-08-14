@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>LuxAuto Administrator Dashboard</title>
+  <title>LuxAuto Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   @vite('resources/css/app.css')
@@ -182,9 +182,17 @@
       justify-content: center;
       align-items: center;
       display: none;
+	  z-index: 9999;
     }
 	
-    .modal.active { display: flex; }
+    .modal.active { 
+		display: flex;
+		z-index: 9999;
+	}
+
+	.modal > div {
+		z-index: 10000;
+	}
 	
   </style>
 </head>
@@ -237,7 +245,7 @@
       <!-- Administrator Dashboard -->
       <div class="glass-effect rounded-2xl p-8 mb-6 shadow-2xl">
         <div class="gradient-bg rounded-xl p-6 mb-8 text-white">
-          <h2 class="text-3xl font-bold mb-2"><i class="fas fa-user-shield mr-3"></i>Administrator Dashboard</h2>
+          <h2 class="text-3xl font-bold mb-2"><i class="fas fa-user-shield mr-3"></i>Welcome to the Dashboard</h2>
           <p class="text-lg opacity-90">Complete system management and oversight</p>
         </div>
 
@@ -290,7 +298,7 @@
 		</div>
 
 		<!-- Customer Management Tab -->
-		<div id="customerTab" class="tab-content bg-white xp-6 rounded shadow active">
+		<div id="customerTab" class="tab-content bg-white p-6 rounded shadow active">
 		  <h2 class="text-2xl font-bold text-blue-600 mb-4">Customer Management</h2>
 		  <button onclick="openModal('customer')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Customer</button>
 		  <table class="min-w-full divide-y divide-gray-200">
@@ -300,8 +308,6 @@
 					<th class="px-4 py-2">Name</th>
 					<th class="px-4 py-2">Email</th>
 					<th class="px-4 py-2">Phone</th>
-					<th class="px-4 py-2">Username</th>
-					<th class="px-4 py-2">Password</th>
 					<th class="px-4 py-2">Action</th>
 				</tr>
 			</thead>
@@ -313,8 +319,6 @@
 					<td class="px-4 py-2">{{ $customer->customerName }}</td>
 					<td class="px-4 py-2">{{ $customer->email }}</td>
 					<td class="px-4 py-2">{{ $customer->contactNumber }}</td>
-					<td class="px-4 py-2">{{ $customer->username }}</td>
-					<td class="px-4 py-2">{{ $customer->password }}</td>
 					<td class="px-4 py-2">
 					<button onclick="editRow(this, 'customer')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 					<button onclick="deleteRow(this, 'customer')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
@@ -323,7 +327,7 @@
 				@endforeach
 				@else
 				<tr>
-					<td colspan="6" class="px-4 py-2 text-center text-gray-500">No customers found</td>
+					<td colspan="7" class="px-4 py-2 text-center text-gray-500">No customers found</td>
 				</tr>
 				@endif
 			</tbody>
@@ -403,7 +407,7 @@
 		<!-- Vehicle Repair Management Tab -->
 		<div id="vehicleRepairTab" class="tab-content bg-white p-6 rounded shadow">
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Vehicle Repair Management</h2>
-		  <button onclick="openModal('Vehicle_Repairs')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Vehicle Repair History</button>
+		  <button onclick="openModal('vehicle_repair')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Vehicle Repair History</button>
 		  <table class="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr class="bg-gray-100 text-left text-gray-600">
@@ -428,8 +432,8 @@
 					<td class="px-4 py-2">${{ $repair->price }}</td>
 					<td class="px-4 py-2">{{ $repair->technician }}</td>
 					<td class="px-4 py-2">
-						<button onclick="editRow(this, 'Vehicle_Repairs')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-						<button onclick="deleteRow(this, 'Vehicle_Repairs')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+						<button onclick="editRow(this, 'vehicle_repair')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+						<button onclick="deleteRow(this, 'vehicle_repair')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
 					</td>
 				</tr>
 				@endforeach
@@ -440,7 +444,7 @@
 		<!-- Repair Booking Management Tab -->
 		<div id="repairBookingTab" class="tab-content bg-white p-6 rounded shadow">
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Repair Booking Management</h2>
-		  <button onclick="openModal('Repair_Booking')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Repair Booking</button>
+		  <button onclick="openModal('repair_booking')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Repair Booking</button>
 		  <table class="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr class="bg-gray-100 text-left text-gray-600">
@@ -473,7 +477,7 @@
 		<!-- Vehicle Service Management Tab -->
 		<div id="vehicleServiceTab" class="tab-content bg-white p-6 rounded shadow">
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Vehicle Service Management</h2>
-		  <button onclick="openModal('Vehicle_Service')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Vehicle Service History</button>
+		  <button onclick="openModal('vehicle_service')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Vehicle Service History</button>
 		  <table class="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr class="bg-gray-100 text-left text-gray-600">
@@ -498,8 +502,8 @@
 					<td class="px-4 py-2">${{ $service->price }}</td>
 					<td class="px-4 py-2">{{ $service->technician }}</td>
 					<td class="px-4 py-2">
-						<button onclick="editRow(this, 'Vehicle_Service')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-						<button onclick="deleteRow(this, 'Vehicle_Service')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+						<button onclick="editRow(this, 'vehicle_service')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+						<button onclick="deleteRow(this, 'vehicle_service')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
 					</td>
 				</tr>
 				@endforeach
@@ -510,7 +514,7 @@
 		<!-- Service Booking Management Tab -->
 		<div id="serviceBookingTab" class="tab-content bg-white p-6 rounded shadow">
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Service Booking Management</h2>
-		  <button onclick="openModal('Service_Booking')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Service Booking</button>
+		  <button onclick="openModal('service_booking')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Service Booking</button>
 		  <table class="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr class="bg-gray-100 text-left text-gray-600">
@@ -543,7 +547,7 @@
 		<!-- Customer Chat Management Tab -->
 		<div id="customerChatTab" class="tab-content bg-white p-6 rounded shadow">
 		  <h2 class="text-2xl font-bold text-yellow-600 mb-4">Customer Chat Management</h2>
-		  <button onclick="openModal('Customer_Chat')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Customer Chat</button>
+		  <button onclick="openModal('customer_chat')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Customer Chat</button>
 		  <table class="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr class="bg-gray-100 text-left text-gray-600">
@@ -566,8 +570,8 @@
 					<td class="px-4 py-2">{{ $chat->employee->employeeName }}</td>
 					<td class="px-4 py-2">{{ $chat->status }}</td>
 					<td class="px-4 py-2">
-						<button onclick="editRow(this, 'Customer_Chat')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-						<button onclick="deleteRow(this, 'Customer_Chat')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+						<button onclick="editRow(this, 'customer_chat')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+						<button onclick="deleteRow(this, 'customer_chat')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
 					</td>
 				</tr>
 				@endforeach
@@ -589,8 +593,6 @@
 					<th class="px-4 py-2">Contact</th>
 					<th class="px-4 py-2">Role</th>
 					<th class="px-4 py-2">Salary</th>
-					<th class="px-4 py-2">Username</th>
-					<th class="px-4 py-2">Password</th>
 					<th class="px-4 py-2">Action</th>
 				</tr>
 			</thead>
@@ -604,8 +606,6 @@
 					<td class="px-4 py-2">{{ $employee->contactNumber }}</td>
 					<td class="px-4 py-2">{{ $employee->role }}</td>
 					<td class="px-4 py-2">${{ $employee->salary }}</td>
-					<td class="px-4 py-2">{{ $employee->username }}</td>
-					<td class="px-4 py-2">{{ $employee->password }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'employee')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 						<button onclick="deleteRow(this, 'employee')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
@@ -619,7 +619,7 @@
 		<!-- Product Management Tab -->
 		<div id="productTab" class="tab-content bg-white p-6 rounded shadow">
 		  <h2 class="text-2xl font-bold text-cyan-600 mb-4">Product Management</h2>
-		   <button onclick="openModal('product')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Product</button>
+		  <button onclick="openModal('part')" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Add Product</button>
 		  <table class="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr class="bg-gray-100 text-left text-gray-600">
@@ -646,8 +646,8 @@
 					<td class="px-4 py-2">{{ $product->description }}</td>
 					<td class="px-4 py-2">{{ $product->quantityInStock }}</td>
 					<td class="px-4 py-2">
-						<button onclick="editRow(this, 'product')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-						<button onclick="deleteRow(this, 'product')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+						<button onclick="editRow(this, 'part')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+						<button onclick="deleteRow(this, 'part')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
 					</td>
 				</tr>
 				@endforeach
@@ -795,11 +795,11 @@
 		];
 		
 		const fields = {
-			customer: ['Customer Name', 'Email', 'Contact Number', 'Username', 'Password'],
+			customer: ['Customer Name', 'Email', 'Contact Number'],
 			customer_delivery: ['Customer ID', 'Address', 'City', 'Zip Code'],
 			customer_vehicle: ['Customer ID', 'Vehicle Number', 'Vehicle Brand', 'Vehicle Model', 'Trim Edition', 'Modal Year', 'Description'],
 			vehicle_repair: ['Customer ID', 'Vehicle ID', 'Repair Date', 'Description', 'Price', 'Technician'],
-			vehicle_service: ['Customer ID', 'Vehicle ID', 'Service Date', 'Description', 'Price', 'Next Service Date', 'Technician'],
+			vehicle_service: ['Customer ID', 'Vehicle ID', 'Service Date', 'Description', 'Price', 'Technician'],
 			repair_booking: ['Customer ID', 'Vehicle ID', 'Slot Number', 'Date', 'Time', 'Technician In Charge'],
 			service_booking: ['Customer ID', 'Vehicle ID', 'Slot Number', 'Date', 'Time', 'Technician'],
 			customer_chat: ['Customer ID', 'Employee ID', 'Date', 'Description', 'Status'],
@@ -812,9 +812,7 @@
 			customer: {
 				'Customer_Name': 'customerName',
 				'Email': 'email',
-				'Contact_Number': 'contactNumber',
-				'Username': 'username', 
-				'Password': 'password'
+				'Contact_Number': 'contactNumber'
 			},
 			employee: {
 				'Employee_Name': 'employeeName',
@@ -822,9 +820,7 @@
 				'Email': 'email',
 				'Contact_Number': 'contactNumber',
 				'Role': 'role',
-				'Salary': 'salary',
-				'Username': 'username',
-				'Password': 'password'
+				'Salary': 'salary'
 			},
 			part: {
 				'Part_Name': 'partName',
@@ -900,6 +896,26 @@
 			}
 		};
 
+		const addFieldMapping = {
+			customer: {
+				'Customer_Name': 'customerName',
+				'Email': 'email',
+				'Contact_Number': 'contactNumber',
+				'Username': 'username',
+				'Password': 'password'
+			},
+			employee: {
+				'Employee_Name': 'employeeName',
+				'NIC': 'nic',
+				'Email': 'email',
+				'Contact_Number': 'contactNumber',
+				'Role': 'role',
+				'Salary': 'salary',
+				'Username': 'username',
+				'Password': 'password'
+			}
+		}
+
 		const apiEndpoints = {
 			customer: '/dashboard/customers',
 			customer_delivery: '/dashboard/customer-deliveries',
@@ -926,7 +942,24 @@
 			customer_chat: 'customerChatTable',
 			employee: 'employeeTable',
 			part: 'productTable',
-			job: 'jobTable'
+			job: 'jobTable',
+			order: 'orderTable'
+		};
+
+		// Separate fields for add operations (includes password)
+		const addFields = {
+			customer: ['Customer Name', 'Email', 'Contact Number', 'Username', 'Password'],
+			employee: ['Employee Name', 'NIC', 'Email', 'Contact Number', 'Role', 'Salary', 'Username', 'Password'],
+			// Other contexts remain the same as fields object
+			customer_delivery: ['Customer ID', 'Address', 'City', 'Zip Code'],
+			customer_vehicle: ['Customer ID', 'Vehicle Number', 'Vehicle Brand', 'Vehicle Model', 'Trim Edition', 'Modal Year', 'Description'],
+			vehicle_repair: ['Customer ID', 'Vehicle ID', 'Repair Date', 'Description', 'Price', 'Technician'],
+			vehicle_service: ['Customer ID', 'Vehicle ID', 'Service Date', 'Description', 'Price', 'Technician'],
+			repair_booking: ['Customer ID', 'Vehicle ID', 'Slot Number', 'Date', 'Time', 'Technician In Charge'],
+			service_booking: ['Customer ID', 'Vehicle ID', 'Slot Number', 'Date', 'Time', 'Technician'],
+			customer_chat: ['Customer ID', 'Employee ID', 'Date', 'Description', 'Status'],
+			part: ['Part Name', 'Part Number', 'Brand', 'Model', 'Price', 'Description', 'Quantity In Stock'],
+			job: ['Type', 'Customer', 'Date', 'Time', 'Description', 'Technician']
 		};
 
 		function showTab(id) {
@@ -958,7 +991,10 @@
 			editMode = false;
 			editId = null;
 			formContext = context;
-			generateForm(fields[context] || []);
+			
+			// Use addFields for new records (includes password), fields for editing (no password)
+			const fieldsToUse = addFields[context] || fields[context] || [];
+			generateForm(fieldsToUse);
 			document.getElementById('modalTitle').innerText = `Add ${capitalize(context.replace('_', ' '))}`;
 			document.getElementById('formModal').classList.add('active');
 		}
@@ -971,9 +1007,10 @@
 			formContext = context;
 			
 			// Get values from row (skip ID and Action columns)
-			const values = Array.from(row.children).slice(1, -1).map(td => {
+			const cells = Array.from(row.children)
+			const values = slice(1, -1).map(td => {
 				let text = td.innerText.trim();
-				if (text.startsWith(')) {
+				if (text.startsWith('$')) {
 					text = text.substring(1);
 				}
 				return text;
@@ -1009,9 +1046,15 @@
 			
 			// Convert FormData to regular object with proper field mapping
 			const data = {};
+			
+			// Choose the right mapping based on whether it's edit mode or add mode
+			const mappingToUse = editMode ? fieldMapping : addFieldMapping;
+			
 			for (let [key, value] of formData.entries()) {
 				// Apply field mapping if it exists for this context
-				if (fieldMapping[formContext] && fieldMapping[formContext][key]) {
+				if (mappingToUse[formContext] && mappingToUse[formContext][key]) {
+					data[mappingToUse[formContext][key]] = value;
+				} else if (fieldMapping[formContext] && fieldMapping[formContext][key]) {
 					data[fieldMapping[formContext][key]] = value;
 				} else {
 					// Convert field name to snake_case for database compatibility
@@ -1020,6 +1063,7 @@
 				}
 			}
 
+			// Rest of the function remains the same...
 			console.log('Form Data:', data);
 			console.log('Form Context:', formContext);
 			console.log('Edit Mode:', editMode);
@@ -1158,8 +1202,9 @@
 			console.log('Dashboard loaded successfully!');
 			console.log('CSRF Token:', csrfToken);
 			
-			// Show customer tab by default
-			showTab('customerTab');
+			// Initialize role-based UI first
+    		initializeRoleBasedUI();
+
 		});
 
 		const userRole = '{{ auth()->user()->role }}';
@@ -1227,11 +1272,11 @@
 			}
 		}
 
-		// Call this function when page loads
+		/*// Call this function when page loads
 		document.addEventListener('DOMContentLoaded', function() {
 			initializeRoleBasedUI();
 			console.log('Dashboard loaded for role:', userRole);
-		});
+		});*/
 	</script>
 </body>
 </html>
