@@ -12,7 +12,7 @@ class CartController extends Controller
     public function index()
     {
         $cartItems = Cart::with(['part' => function($query) {
-                $query->select('idPart', 'partName', 'partNumber', 'brand', 'model', 'price', 'description', 'quantityInStock');
+                $query->select('id', 'partName', 'partNumber', 'brand', 'model', 'price', 'description', 'quantityInStock');
             }])
             ->where('user_id', Auth::id())
             ->get();
@@ -28,27 +28,45 @@ class CartController extends Controller
         ]);
 
         $part = Part::findOrFail($request->part_id);
+        $requestedQuantity = $request->quantity ?? 1;
         
-        if ($part->quantityInStock < ($request->quantity ?? 1)) {
+        if ($part->quantityInStock < $requestedQuantity) {
             return response()->json(['error' => 'Insufficient stock'], 400);
         }
 
-        $cartItem = Cart::updateOrCreate(
-            [
+        // Check if item already exists in cart
+        $existingCartItem = Cart::where('user_id', Auth::id())
+                            ->where('part_id', $request->part_id)
+                            ->first();
+
+        if ($existingCartItem) {
+            // Check total quantity doesn't exceed stock
+            $newQuantity = $existingCartItem->quantity + $requestedQuantity;
+            if ($part->quantityInStock < $newQuantity) {
+                return response()->json(['error' => 'Insufficient stock for total quantity'], 400);
+            }
+            
+            // Update existing item
+            $existingCartItem->update([
+                'quantity' => $newQuantity
+            ]);
+            $cartItem = $existingCartItem;
+        } else {
+            // Create new cart item
+            $cartItem = Cart::create([
                 'user_id' => Auth::id(),
-                'part_id' => $request->part_id
-            ],
-            [
-                'quantity' => \DB::raw('quantity + ' . ($request->quantity ?? 1)),
+                'part_id' => $request->part_id,
+                'quantity' => $requestedQuantity,
                 'price' => $part->price
-            ]
-        );
+            ]);
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Item added to cart',
             'data' => $cartItem->load('part')
         ]);
+
     }
 
     public function update(Request $request, Cart $cart)

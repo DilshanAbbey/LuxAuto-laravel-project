@@ -13,20 +13,19 @@ return new class extends Migration
         Schema::dropIfExists('carts');
         
         // Create proper carts table
-        Schema::create('cart', function (Blueprint $table) {
+        Schema::create('carts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('part_id')->constrained('parts', 'idPart')->onDelete('cascade');
+            $table->foreignId('part_id')->constrained('parts')->onDelete('cascade');
             $table->integer('quantity');
-            $table->decimal('totalprice', 10, 2);
+            $table->decimal('price', 10, 2);
             $table->timestamps();
             
-            $table->unique(['user_id', 'part_id']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('cart');
+        Schema::dropIfExists('carts');
     }
 };

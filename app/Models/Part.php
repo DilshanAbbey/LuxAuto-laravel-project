@@ -10,7 +10,7 @@ class Part extends Model
     use HasFactory;
 
     protected $fillable = [
-        'idPart',
+        'id',
         'partName', 
         'partNumber', 
         'brand', 

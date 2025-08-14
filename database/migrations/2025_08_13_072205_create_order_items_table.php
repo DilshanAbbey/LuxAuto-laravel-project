@@ -8,18 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::dropIfExists('order_items');
+    
+
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-            $table->foreignId('part_id')->constrained('parts', 'idPart')->onDelete('cascade');
+            $table->foreignId('part_id')->constrained('parts')->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2);
             $table->decimal('total_price', 10, 2);
             $table->timestamps();
-            
-            // Indexes for better performance
-            $table->index(['order_id']);
-            $table->index(['part_id']);
         });
     }
 

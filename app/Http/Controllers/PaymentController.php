@@ -89,10 +89,10 @@ class PaymentController extends Controller
                 'part_id' => $cartItem->part_id,
                 'quantity' => $cartItem->quantity,
                 'unit_price' => $cartItem->price,
-                'total_price' => $cartItem->total
+                'total_price' => $cartItem->quantity * $cartItem->price // Fix calculation
             ]);
 
-            // Update part inventory
+            // Update part inventory using the correct field
             $cartItem->part->decrement('quantityInStock', $cartItem->quantity);
         }
 

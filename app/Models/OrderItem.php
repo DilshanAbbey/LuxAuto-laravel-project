@@ -21,11 +21,11 @@ class OrderItem extends Model
 
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 
     public function part()
     {
-        return $this->belongsTo(Part::class);
+        return $this->belongsTo(Part::class, 'part_id', 'id');
     }
 }

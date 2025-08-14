@@ -71,4 +71,8 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     // Payment routes
     Route::post('/api/payment/intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent']);
     Route::post('/api/payment/confirm', [App\Http\Controllers\PaymentController::class, 'confirmPayment']);
+
+    // Order routes
+    Route::get('/api/orders', [App\Http\Controllers\OrderController::class, 'index']);
+    Route::get('/api/orders/{order}', [App\Http\Controllers\OrderController::class, 'show']);
 });

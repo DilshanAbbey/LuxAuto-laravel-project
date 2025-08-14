@@ -9,6 +9,8 @@ class Cart extends Model
 {
     use HasFactory;
 
+    protected $table = 'carts';
+
     protected $fillable = [
         'user_id',
         'part_id',
@@ -30,7 +32,7 @@ class Cart extends Model
 
     public function part()
     {
-        return $this->belongsTo(Part::class, 'part_id', 'idPart');
+        return $this->belongsTo(Part::class);
     }
 
     public function getTotalAttribute()

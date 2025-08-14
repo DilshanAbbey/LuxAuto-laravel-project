@@ -625,7 +625,7 @@
         console.log('Cart loaded:', cartItems);
         
         cart = cartItems.map(item => ({
-          id: item.part.id,
+          id: item.part_id,
           name: item.part.partName,
           price: parseFloat(item.part.price),
           image: `https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=220&fit=crop&auto=format&q=80&seed=${item.part.id}`,
@@ -689,7 +689,7 @@
       const newQuantity = item.quantity + change;
       
       if (newQuantity <= 0) {
-        await removeFromCart(productId);
+        await removeFromCart(item.cartItemId);
         return;
       }
       
@@ -723,17 +723,14 @@
     }
 
     // Remove from cart
-    async function removeFromCart(productId) {
+    async function removeFromCart(cartItemId) {
       try {
-        const item = cart.find(item => item.id === productId);
-        if (!item) return;
-        
-        const response = await fetch(`/api/cart/${item.cartItemId}`, {
-          method: 'DELETE',
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': getCSRFToken()
-          }
+        const response = await fetch(`/api/cart/${cartItemId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': getCSRFToken()
+            }
         });
 
         const result = await response.json();
@@ -905,7 +902,7 @@
               <button class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded flex items-center justify-center transition-colors" onclick="updateQuantity(${item.id}, -1)">-</button>
               <span class="w-8 text-center">${item.quantity}</span>
               <button class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded flex items-center justify-center transition-colors" onclick="updateQuantity(${item.id}, 1)">+</button>
-              <button class="text-red-500 hover:text-red-700 ml-2 transition-colors" onclick="removeFromCart(${item.id})">
+              <button class="text-red-500 hover:text-red-700 ml-2 transition-colors" onclick="removeFromCart(${item.cartItemId})">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
