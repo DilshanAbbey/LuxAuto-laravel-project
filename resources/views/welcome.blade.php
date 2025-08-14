@@ -695,6 +695,34 @@
       }
     });
 
+    async function loadBestSellers() {
+        try {
+            const response = await fetch('/api/products/top5');
+            if (!response.ok) throw new Error('Failed to load best sellers');
+
+            const bestSellers = await response.json();
+            renderBestSellers(bestSellers);
+        } catch (err) {
+            console.error(err);
+            document.getElementById('bestSellers').innerHTML = `<p>Failed to load best sellers</p>`;
+        }
+    }
+
+    function renderBestSellers(items) {
+        const container = document.getElementById('bestSellers');
+        container.innerHTML = items.map(item => `
+            <div class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                <img src="${item.image}" class="w-full h-48 object-cover" alt="${item.partName}">
+                <div class="p-4">
+                    <h5 class="font-semibold text-lg mb-1">${item.partName}</h5>
+                    <p class="text-gray-600 text-sm">${item.brand} - ${item.model}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadBestSellers);
+
     window.addEventListener("load", () => {
       setTimeout(() => {
         document.getElementById("loader").style.display = "none";

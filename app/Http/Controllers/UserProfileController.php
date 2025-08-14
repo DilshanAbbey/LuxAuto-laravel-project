@@ -23,6 +23,7 @@ class UserProfileController extends Controller
                     'email' => $customer->email,
                     'phone' => $customer->contactNumber,
                     'username' => $customer->username,
+                    'password' > $customer->password,
                     'type' => 'Customer'
                 ]);
             }

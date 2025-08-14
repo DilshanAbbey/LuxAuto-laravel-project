@@ -251,7 +251,7 @@
   </header>
   
   <!-- Menu Icons -->
-  <div class="flex items-center ml-3 space-x-2">
+  <div class="flex items-center ml-3 mr-3 space-x-2 bg-black opacity-70">
     <!-- Shopping Cart -->
     <div class="menu-icon relative p-2 rounded-lg text-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer" onclick="toggleOffcanvas('cartOffcanvas')">
       <i class="fas fa-shopping-cart text-lg"></i>
@@ -641,7 +641,7 @@
     }
 
     // Add product to cart
-    async function addToCart(productId) {
+    async function addToCart(productId, event) {
       console.log('Adding to cart:', productId);
       try {
         const response = await fetch('/api/cart', {
@@ -787,13 +787,13 @@
 
       grid.innerHTML = filteredProducts.map(product => `
         <div class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-          <img src="${product.image}" class="w-full h-48 object-cover" alt="${product.name}" loading="lazy">
+          <img src="images/product-image.png" class="w-full h-48 object-cover" loading="lazy">
           <div class="p-4">
             <h5 class="font-semibold text-lg mb-2">${product.name}</h5>
             <p class="text-gray-600 text-sm mb-3 line-clamp-2">${product.description}</p>
             <div class="flex justify-between items-center mb-3">
               <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${product.category}</span>
-              <span class="text-green-600 font-bold text-lg">${product.price.toFixed(2)}</span>
+              <span class="text-green-600 font-bold text-lg">$${product.price.toFixed(2)}</span>
             </div>
             <div class="flex gap-2">
               <button 
@@ -803,7 +803,7 @@
               </button>
               <button 
                 class="flex-1 bg-green-600 text-white py-2 px-3 rounded hover:bg-green-700 transition-colors text-sm ${product.quantityInStock <= 0 ? 'opacity-50 cursor-not-allowed' : ''}"
-                onclick="addToCart(${product.id})"
+                onclick="addToCart(${product.id}, event)"
                 ${product.quantityInStock <= 0 ? 'disabled' : ''}>
                 <i class="fas fa-cart-plus mr-1"></i>Add
               </button>
@@ -829,7 +829,7 @@
       document.getElementById('modalBody').innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <img src="${product.image}" class="w-full rounded-lg" alt="${product.name}">
+            <img src="images/product-image.png" class="w-full rounded-lg">
           </div>
           <div>
             <h4 class="text-2xl font-bold text-green-600 mb-3">${product.price.toFixed(2)}</h4>
@@ -892,7 +892,6 @@
       cartItems.innerHTML = cart.map(item => `
         <div class="border-b pb-4 mb-4 last:border-b-0">
           <div class="flex items-center gap-3">
-            <img src="${item.image}" class="w-16 h-16 object-cover rounded" alt="${item.name}">
             <div class="flex-1">
               <h6 class="font-semibold">${item.name}</h6>
               <p class="text-gray-600 text-sm">${item.price.toFixed(2)} each</p>
@@ -1006,6 +1005,8 @@
       if (!email || email.trim() === '') return;
 
       const phone = prompt('Enter your phone:', user.phone || '');
+      const username = prompt('Enter your phone:', user.phone || '');
+      const password = prompt('Enter your phone:', user.phone || '');
       
       try {
         const response = await fetch('/api/user', {
@@ -1018,7 +1019,10 @@
           body: JSON.stringify({
             customerName: name.trim(),
             email: email.trim(),
-            contactNumber: phone.trim()
+            contactNumber: phone.trim(),
+            username: username.trim(),
+            password: password.trim()
+
           })
         });
 
