@@ -46,7 +46,7 @@ Route::middleware(['auth', 'role:administrator,employee,technician'])->prefix('d
     Route::apiResource('customers', App\Http\Controllers\Api\CustomerController::class);
     Route::apiResource('employees', App\Http\Controllers\Api\EmployeeController::class);
     Route::apiResource('parts', App\Http\Controllers\Api\PartController::class);
-    Route::apiResource('jobs', App\Http\Controllers\Api\JobController::class);
+    Route::apiResource('tasks', App\Http\Controllers\Api\JobController::class);
     Route::apiResource('customer-deliveries', App\Http\Controllers\Api\CustomerDeliveryController::class);
     Route::apiResource('customer-vehicles', App\Http\Controllers\Api\CustomerVehicleController::class);
     Route::apiResource('vehicle-repairs', App\Http\Controllers\Api\VehicleRepairController::class);
@@ -54,6 +54,7 @@ Route::middleware(['auth', 'role:administrator,employee,technician'])->prefix('d
     Route::apiResource('repair-bookings', App\Http\Controllers\Api\RepairBookingController::class);
     Route::apiResource('service-bookings', App\Http\Controllers\Api\ServiceBookingController::class);
     Route::apiResource('customer-chats', App\Http\Controllers\Api\CustomerChatController::class);
+    Route::apiResource('orders', App\Http\Controllers\Api\OrderController::class)->only(['index', 'show', 'update']);
 });
 
 Route::middleware(['auth', 'role:customer'])->group(function () {
@@ -73,6 +74,6 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::post('/api/payment/confirm', [App\Http\Controllers\PaymentController::class, 'confirmPayment']);
 
     // Order routes
-    Route::get('/api/orders', [App\Http\Controllers\OrderController::class, 'index']);
-    Route::get('/api/orders/{order}', [App\Http\Controllers\OrderController::class, 'show']);
+    Route::get('/api/orders', [App\Http\Controllers\Api\OrderController::class, 'index']);
+    Route::get('/api/orders/{order}', [App\Http\Controllers\Api\OrderController::class, 'show']);
 });

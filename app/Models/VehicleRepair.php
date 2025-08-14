@@ -10,8 +10,13 @@ class VehicleRepair extends Model
     use HasFactory;
 
     protected $fillable = [
-        'customer_id', 'vehicle_number', 'repair_date', 
-        'description', 'price', 'technician_in_charge'
+        'idVehicle_Repair',
+        'customer_id', 
+        'vehicle_id', 
+        'repairDate', 
+        'description', 
+        'price', 
+        'technician'
     ];
 
     protected $casts = [

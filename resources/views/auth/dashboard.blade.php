@@ -286,6 +286,7 @@
 		  <button onclick="showTab('employeeTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Employee Management</button>
 		  <button onclick="showTab('productTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Product Management</button>
 		  <button onclick="showTab('jobTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Job Management</button>
+		  <button onclick="showTab('orderTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Order Management</button>
 		</div>
 
 		<!-- Customer Management Tab -->
@@ -664,31 +665,92 @@
 					<th class="px-4 py-2">Job ID</th>
 					<th class="px-4 py-2">Type</th>
 					<th class="px-4 py-2">Customer Name</th>
-					<th class="px-4 py-2">Date of Schedule</th>
+					<th class="px-4 py-2">Date</th>
+					<th class="px-4 py-2">Time</th>
 					<th class="px-4 py-2">Description</th>
-					<th class="px-4 py-2">Price</th>
 					<th class="px-4 py-2">Technician In-Charge</th>
 					<th class="px-4 py-2">Action</th>
 				</tr>
 			</thead>
 			<tbody class="divide-y divide-gray-200" id="jobTable">
+				@if(isset($data['jobs']) && count($data['jobs']) > 0)
 				@foreach($data['jobs'] as $job)
 				<tr data-id="{{ $job->id }}">
 					<td class="px-4 py-2">{{ $job->id }}</td>
 					<td class="px-4 py-2">{{ $job->type }}</td>
 					<td class="px-4 py-2">{{ $job->customer }}</td>
-					<td class="px-4 py-2">{{ $job->date->format('Y-m-d') }}</td>
+					<td class="px-4 py-2">{{ is_object($job->date) ? $job->date->format('Y-m-d') : $job->date }}</td>
+					<td class="px-4 py-2">{{ $job->time }}</td>
 					<td class="px-4 py-2">{{ $job->description }}</td>
-					<td class="px-4 py-2">${{ $job->price }}</td>
 					<td class="px-4 py-2">{{ $job->technician }}</td>
 					<td class="px-4 py-2">
+						@if(!auth()->user()->isTechnician())
 						<button onclick="editRow(this, 'job')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
 						<button onclick="deleteRow(this, 'job')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+						@else
+						<span class="text-gray-500">View Only</span>
+						@endif
 					</td>
 				</tr>
 				@endforeach
+				@else
+				<tr>
+					<td colspan="8" class="px-4 py-2 text-center text-gray-500">No jobs available</td>
+				</tr>
+				@endif
 			</tbody>
 		  </table>
+		</div>
+
+		<!-- Order Management Tab -->
+		<div id="orderTab" class="tab-content bg-white p-6 rounded shadow">
+		<h2 class="text-2xl font-bold text-purple-600 mb-4">Order Management</h2>
+			<table class="min-w-full divide-y divide-gray-200">
+				<thead>
+					<tr class="bg-gray-100 text-left text-gray-600">
+						<th class="px-4 py-2">Order Number</th>
+						<th class="px-4 py-2">Customer Name</th>
+						<th class="px-4 py-2">Total Amount</th>
+						<th class="px-4 py-2">Status</th>
+						<th class="px-4 py-2">Payment Status</th>
+						<th class="px-4 py-2">Order Date</th>
+						<th class="px-4 py-2">Action</th>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-gray-200" id="orderTable">
+					@foreach($data['orders'] as $order)
+					<tr data-id="{{ $order->id }}">
+						<td class="px-4 py-2">{{ $order->order_number }}</td>
+						<td class="px-4 py-2">{{ $order->user->name ?? 'N/A' }}</td>
+						<td class="px-4 py-2">${{ $order->total_amount }}</td>
+						<td class="px-4 py-2">
+							<span class="px-2 py-1 text-xs rounded 
+								@if($order->status === 'delivered') bg-green-200 text-green-800
+								@elseif($order->status === 'processing') bg-blue-200 text-blue-800
+								@elseif($order->status === 'shipped') bg-yellow-200 text-yellow-800
+								@else bg-gray-200 text-gray-800 @endif">
+								{{ ucfirst($order->status) }}
+							</span>
+						</td>
+						<td class="px-4 py-2">
+							<span class="px-2 py-1 text-xs rounded 
+								@if($order->payment_status === 'paid') bg-green-200 text-green-800
+								@elseif($order->payment_status === 'failed') bg-red-200 text-red-800
+								@else bg-gray-200 text-gray-800 @endif">
+								{{ ucfirst($order->payment_status) }}
+							</span>
+						</td>
+						<td class="px-4 py-2">{{ $order->created_at->format('Y-m-d H:i') }}</td>
+						<td class="px-4 py-2">
+							<button onclick="viewOrder({{ $order->id }})" class="bg-blue-500 text-white px-3 py-1 rounded">View</button>
+							@if($order->status !== 'delivered' && $order->status !== 'cancelled')
+							<button onclick="updateOrderStatus({{ $order->id }})" class="bg-yellow-500 text-white px-3 py-1 rounded ml-2">Update Status</button>
+							@endif
+						</td>
+					</tr>
+					@endforeach
+				</tbody>
+			</table>
 		</div>
 	  </main>
 	  
@@ -728,7 +790,8 @@
 			'customerChatTab',
 			'employeeTab',
 			'productTab',
-			'jobTab'
+			'jobTab',
+			'orderTab'
 		];
 		
 		const fields = {
@@ -742,7 +805,7 @@
 			customer_chat: ['Customer ID', 'Employee ID', 'Date', 'Description', 'Status'],
 			employee: ['Employee Name', 'NIC', 'Email', 'Contact Number', 'Role', 'Salary', 'Username', 'Password'],
 			part: ['Part Name', 'Part Number', 'Brand', 'Model', 'Price', 'Description', 'Quantity In Stock'],
-			job: ['Type', 'Customer', 'Date', 'Description', 'Price', 'Technician']
+			job: ['Type', 'Customer', 'Date', 'Time', 'Description', 'Technician']
 		};
 
 		const fieldMapping = {
@@ -831,8 +894,8 @@
 				'Type': 'type',
 				'Customer': 'customer',
 				'Date': 'date',
+				'Time': 'time',
 				'Description': 'description',
-				'Price': 'price',
 				'Technician': 'technician'
 			}
 		};
@@ -848,7 +911,8 @@
 			customer_chat: '/dashboard/customer-chats',
 			employee: '/dashboard/employees',
 			part: '/dashboard/parts',
-			job: '/dashboard/jobs'
+			job: '/dashboard/tasks', // Point to tasks endpoint
+    		order: '/dashboard/orders'
 		};
 
 		const tableBodyIds = {
@@ -882,7 +946,8 @@
 				'customerChat': 'customer_chat',
 				'employee': 'employee',
 				'product': 'part',
-				'job': 'job'
+				'job': 'job',
+				'order': 'order'
 			};
 			
 			formContext = tabMapping[activeTab] || activeTab;
@@ -1106,18 +1171,15 @@
 				// Technicians can only see their jobs and job history
 				tabsToHide = [
 					'customerTab', 'customerDeliveryTab', 'employeeTab', 
-				 	'customerVehicleTab',
-					'repairBookingTab', 'serviceBookingTab'
+					'customerVehicleTab',
+					'repairBookingTab', 'serviceBookingTab', 'orderTab'
 				];
-				// Show default tab for technician
 				setTimeout(() => showTab('jobTab'), 100);
 			} else if (userRole === 'employee') {
 				// Employees cannot see customer management and employee management
-				tabsToHide = ['customerTab', 'employeeTab'];
-				// Show default tab for employee
-				setTimeout(() => showTab('productTab'), 100);
+				tabsToHide = ['customerTab', 'employeeTab',];
+				setTimeout(() => showTab('orderTab'), 100); // Show orders first for employees
 			} else if (userRole === 'administrator') {
-				// Show default tab for administrator
 				setTimeout(() => showTab('customerTab'), 100);
 			}
 			
@@ -1127,6 +1189,42 @@
 					tabButton.style.display = 'none';
 				}
 			});
+		}
+
+		// Add order management functions
+		function viewOrder(orderId) {
+			// Implement order viewing functionality
+			alert('Order details for ID: ' + orderId);
+		}
+
+		function updateOrderStatus(orderId) {
+			// Implement order status update functionality
+			const newStatus = prompt('Enter new status (pending, processing, shipped, delivered, cancelled):');
+			if (newStatus) {
+				// Make API call to update order status
+				fetch(`/dashboard/orders/${orderId}`, {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRF-TOKEN': csrfToken,
+						'Accept': 'application/json'
+					},
+					body: JSON.stringify({ status: newStatus })
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data.success) {
+						alert('Order status updated successfully');
+						window.location.reload();
+					} else {
+						alert('Error updating order status');
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					alert('Network error occurred');
+				});
+			}
 		}
 
 		// Call this function when page loads

@@ -10,8 +10,14 @@ class CustomerVehicle extends Model
     use HasFactory;
 
     protected $fillable = [
-        'customer_id', 'vehicle_number', 'vehicle_brand', 
-        'model', 'trim_edition', 'modal_year', 'description'
+        'idCustomer_Vehicle',
+        'customer_id', 
+        'vehicleNumber', 
+        'vehicleBrand', 
+        'model', 
+        'trim_edition', 
+        'modalYear', 
+        'description'
     ];
 
     public function customer()

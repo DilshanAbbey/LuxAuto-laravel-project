@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Part;
-use App\Models\Job;
+use App\Models\Task;
+use App\Models\Order;
 use App\Models\CustomerDelivery;
 use App\Models\CustomerVehicle;
 use App\Models\VehicleRepair;
@@ -29,6 +30,7 @@ class DashboardController extends Controller
             'employees' => collect(),
             'parts' => collect(),
             'jobs' => collect(),
+            'orders' => collect(),
             'customerDeliveries' => collect(),
             'customerVehicles' => collect(),
             'vehicleRepairs' => collect(),
@@ -44,7 +46,8 @@ class DashboardController extends Controller
                 'customers' => Customer::all(),
                 'employees' => Employee::all(),
                 'parts' => Part::all(),
-                'jobs' => Job::all(),
+                'jobs' => Task::all(), // Changed from Job to Task
+                'orders' => Order::with('user')->get(), // Add orders
                 'customerDeliveries' => CustomerDelivery::with('customer')->get(),
                 'customerVehicles' => CustomerVehicle::with('customer')->get(),
                 'vehicleRepairs' => VehicleRepair::with(['customer', 'vehicle'])->get(),
@@ -56,10 +59,11 @@ class DashboardController extends Controller
         } elseif ($user->isEmployee()) {
             // Employees can see parts, bookings, vehicles, repairs/services, jobs
             $data = [
-                'customers' => collect(), // Empty collection
+                'customers' => collect(),
                 'employees' => collect(),
                 'parts' => Part::all(),
-                'jobs' => Job::all(),
+                'jobs' => Task::all(), // Changed from Job to Task
+                'orders' => Order::with('user')->get(), // Add orders
                 'customerDeliveries' => collect(),
                 'customerVehicles' => CustomerVehicle::with('customer')->get(),
                 'vehicleRepairs' => VehicleRepair::with(['customer', 'vehicle'])->get(),
@@ -69,37 +73,36 @@ class DashboardController extends Controller
                 'customerChats' => collect(),
             ];
         } elseif ($user->isTechnician()) {
-            
             // Technicians can only see their assigned jobs and job history
-            $technicianName = $user->name; // Assuming technician name matches user name
+            $technicianName = $user->name;
             
             // Combine repair and service bookings as "jobs" for technicians
             $repairJobs = RepairBooking::where('technician_in_charge', $technicianName)
-                ->with('customer', 'vehicle')
+                ->with(['customer', 'vehicle'])
                 ->get()
                 ->map(function($booking) {
                     return (object)[
                         'id' => $booking->id,
                         'type' => 'Repair',
-                        'customer' => $booking->customer->customerName ?? 'N/A',
+                        'customer' => optional($booking->customer)->customerName ?? 'N/A',
                         'date' => $booking->date,
+                        'time' => $booking->time ?? '00:00:00',
                         'description' => 'Vehicle Repair Booking - Slot ' . $booking->slotNumber,
-                        'price' => 0, // Booking doesn't have price
                         'technician' => $booking->technician_in_charge
                     ];
                 });
             
             $serviceJobs = ServiceBooking::where('technician', $technicianName)
-                ->with('customer', 'vehicle')
+                ->with(['customer', 'vehicle'])
                 ->get()
                 ->map(function($booking) {
                     return (object)[
                         'id' => $booking->id,
                         'type' => 'Service',
-                        'customer' => $booking->customer->customerName ?? 'N/A',
+                        'customer' => optional($booking->customer)->customerName ?? 'N/A',
                         'date' => $booking->date,
+                        'time' => $booking->time ?? '00:00:00',
                         'description' => 'Vehicle Service Booking - Slot ' . $booking->slotNumber,
-                        'price' => 0, // Booking doesn't have price
                         'technician' => $booking->technician
                     ];
                 });
@@ -111,6 +114,7 @@ class DashboardController extends Controller
                 'employees' => collect(),
                 'parts' => collect(),
                 'jobs' => $combinedJobs,
+                'orders' => collect(),
                 'customerDeliveries' => collect(),
                 'customerVehicles' => collect(),
                 'vehicleRepairs' => VehicleRepair::where('technician', $technicianName)->with(['customer', 'vehicle'])->get(),
