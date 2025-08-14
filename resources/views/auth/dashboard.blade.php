@@ -386,7 +386,7 @@
 					<td class="px-4 py-2">{{ $vehicle->vehicleNumber }}</td>
 					<td class="px-4 py-2">{{ $vehicle->vehicleBrand }}</td>
 					<td class="px-4 py-2">{{ $vehicle->model }}</td>
-					<td class="px-4 py-2">{{ $vehicle->trim/edition }}</td>
+					<td class="px-4 py-2">{{ $vehicle->trim_edition }}</td>
 					<td class="px-4 py-2">{{ $vehicle->modalYear }}</td>
 					<td class="px-4 py-2">{{ $vehicle->description }}</td>
 					<td class="px-4 py-2">
@@ -1106,13 +1106,20 @@
 				// Technicians can only see their jobs and job history
 				tabsToHide = [
 					'customerTab', 'customerDeliveryTab', 'employeeTab', 
-					'productTab', 'customerChatTab'
+				 	'customerVehicleTab',
+					'repairBookingTab', 'serviceBookingTab'
 				];
+				// Show default tab for technician
+				setTimeout(() => showTab('jobTab'), 100);
 			} else if (userRole === 'employee') {
 				// Employees cannot see customer management and employee management
-				tabsToHide = ['customerTab', 'employeeTab', 'customerChatTab'];
+				tabsToHide = ['customerTab', 'employeeTab'];
+				// Show default tab for employee
+				setTimeout(() => showTab('productTab'), 100);
+			} else if (userRole === 'administrator') {
+				// Show default tab for administrator
+				setTimeout(() => showTab('customerTab'), 100);
 			}
-			// Administrators can see all tabs
 			
 			tabsToHide.forEach(tabId => {
 				const tabButton = document.querySelector(`button[onclick="showTab('${tabId}')"]`);
@@ -1120,15 +1127,6 @@
 					tabButton.style.display = 'none';
 				}
 			});
-			
-			// Show appropriate default tab
-			if (userRole === 'technician') {
-				showTab('jobTab');
-			} else if (userRole === 'employee') {
-				showTab('productTab');
-			} else {
-				showTab('customerTab');
-			}
 		}
 
 		// Call this function when page loads

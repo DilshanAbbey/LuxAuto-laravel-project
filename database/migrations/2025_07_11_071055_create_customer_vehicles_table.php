@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('vehicleNumber');
             $table->string('vehicleBrand');
             $table->string('model');
-            $table->string('trim/edition');
+            $table->string('trim_edition');
             $table->string('modalYear');
             $table->string('descripton');
             $table->string('customer_idCustomer');

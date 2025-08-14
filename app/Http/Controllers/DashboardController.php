@@ -69,20 +69,54 @@ class DashboardController extends Controller
                 'customerChats' => collect(),
             ];
         } elseif ($user->isTechnician()) {
+            
             // Technicians can only see their assigned jobs and job history
             $technicianName = $user->name; // Assuming technician name matches user name
+            
+            // Combine repair and service bookings as "jobs" for technicians
+            $repairJobs = RepairBooking::where('technician_in_charge', $technicianName)
+                ->with('customer', 'vehicle')
+                ->get()
+                ->map(function($booking) {
+                    return (object)[
+                        'id' => $booking->id,
+                        'type' => 'Repair',
+                        'customer' => $booking->customer->customerName ?? 'N/A',
+                        'date' => $booking->date,
+                        'description' => 'Vehicle Repair Booking - Slot ' . $booking->slotNumber,
+                        'price' => 0, // Booking doesn't have price
+                        'technician' => $booking->technician_in_charge
+                    ];
+                });
+            
+            $serviceJobs = ServiceBooking::where('technician', $technicianName)
+                ->with('customer', 'vehicle')
+                ->get()
+                ->map(function($booking) {
+                    return (object)[
+                        'id' => $booking->id,
+                        'type' => 'Service',
+                        'customer' => $booking->customer->customerName ?? 'N/A',
+                        'date' => $booking->date,
+                        'description' => 'Vehicle Service Booking - Slot ' . $booking->slotNumber,
+                        'price' => 0, // Booking doesn't have price
+                        'technician' => $booking->technician
+                    ];
+                });
+            
+            $combinedJobs = $repairJobs->concat($serviceJobs);
             
             $data = [
                 'customers' => collect(),
                 'employees' => collect(),
                 'parts' => collect(),
-                'jobs' => Job::where('technician', $technicianName)->get(),
+                'jobs' => $combinedJobs,
                 'customerDeliveries' => collect(),
                 'customerVehicles' => collect(),
                 'vehicleRepairs' => VehicleRepair::where('technician', $technicianName)->with(['customer', 'vehicle'])->get(),
                 'vehicleServices' => VehicleService::where('technician', $technicianName)->with(['customer', 'vehicle'])->get(),
-                'repairBooking' => RepairBooking::where('technician_in_charge', $technicianName)->with('customer')->get(),
-                'serviceBooking' => ServiceBooking::where('technician', $technicianName)->with('customer')->get(),
+                'repairBooking' => collect(),
+                'serviceBooking' => collect(),
                 'customerChats' => collect(),
             ];
         }
