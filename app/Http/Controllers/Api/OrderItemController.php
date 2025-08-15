@@ -95,10 +95,18 @@ class OrderItemController extends Controller
             'total_price' => $totalPrice
         ]);
 
+        // Update the order's total amount
+        $order = $orderItem->order;
+        $newSubtotal = $order->orderItems->sum('total_price');
+        $order->update([
+            'subtotal' => $newSubtotal,
+            'total_amount' => $newSubtotal + $order->shipping_cost
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Order item updated successfully',
-            'data' => $orderItem->load(['order', 'part'])
+            'data' => $orderItem->load(['order.user', 'part'])
         ]);
     }
 

@@ -756,23 +756,41 @@
 
 		<!-- Order Items Management Tab -->
 		<div id="orderItemsTab" class="tab-content bg-white p-6 rounded shadow">
-		<h2 class="text-2xl font-bold text-purple-600 mb-4">Order Items Management</h2>
+			<h2 class="text-2xl font-bold text-purple-600 mb-4">Order Items Management</h2>
+			<!-- No Add button - only view/edit/delete -->
 			<table class="min-w-full divide-y divide-gray-200">
 				<thead>
 					<tr class="bg-gray-100 text-left text-gray-600">
-						<th class="px-4 py-2">Order Id</th>
-						<th class="px-4 py-2">Part Id</th>
+						<th class="px-4 py-2">Order Number</th>
+						<th class="px-4 py-2">Customer</th>
+						<th class="px-4 py-2">Part Name</th>
 						<th class="px-4 py-2">Quantity</th>
 						<th class="px-4 py-2">Unit Price</th>
 						<th class="px-4 py-2">Total Price</th>
 						<th class="px-4 py-2">Action</th>
 					</tr>
 				</thead>
-				<tbody class="divide-y divide-gray-200" id="orderTable">
-					@foreach($data['orders'] as $order)
-					<tr data-id="{{ $order->id }}">
-					</tr>
-					@endforeach
+				<tbody class="divide-y divide-gray-200" id="orderItemsTable">
+					@if(isset($data['orderItems']) && count($data['orderItems']) > 0)
+						@foreach($data['orderItems'] as $item)
+						<tr data-id="{{ $item->id }}">
+							<td class="px-4 py-2">{{ $item->order->order_number ?? 'N/A' }}</td>
+							<td class="px-4 py-2">{{ $item->order->user->name ?? 'N/A' }}</td>
+							<td class="px-4 py-2">{{ $item->part->partName ?? 'N/A' }}</td>
+							<td class="px-4 py-2">{{ $item->quantity }}</td>
+							<td class="px-4 py-2">${{ $item->unit_price }}</td>
+							<td class="px-4 py-2">${{ $item->total_price }}</td>
+							<td class="px-4 py-2">
+								<button onclick="editRow(this, 'order_item')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+								<button onclick="deleteRow(this, 'order_item')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+							</td>
+						</tr>
+						@endforeach
+					@else
+						<tr>
+							<td colspan="7" class="px-4 py-2 text-center text-gray-500">No order items found</td>
+						</tr>
+					@endif
 				</tbody>
 			</table>
 		</div>
@@ -830,7 +848,8 @@
 			customer_chat: ['Customer ID', 'Employee ID', 'Date', 'Description', 'Status'],
 			employee: ['Employee Name', 'NIC', 'Email', 'Contact Number', 'Role', 'Salary', 'Username', 'Password'],
 			part: ['Part Name', 'Part Number', 'Brand', 'Model', 'Price', 'Description', 'Quantity In Stock'],
-			job: ['Type', 'Customer', 'Date', 'Time', 'Description', 'Technician']
+			job: ['Type', 'Customer', 'Date', 'Time', 'Description', 'Technician'],
+			order_item: ['Quantity', 'Unit Price']
 		};
 
 		const fieldMapping = {
@@ -919,6 +938,10 @@
 				'Description': 'description',
 				'Technician': 'technician'
 			}
+			order_item: {
+				'Quantity': 'quantity',
+				'Unit_Price': 'unit_price'
+			}
 		};
 
 		const addFieldMapping = {
@@ -954,7 +977,7 @@
 			part: '/dashboard/parts',
 			job: '/dashboard/tasks', // Point to tasks endpoint
     		order: '/dashboard/orders'
-			order: '/dashboard/orderItems'
+			order: '/dashboard/order-items'
 		};
 
 		const tableBodyIds = {
@@ -970,7 +993,7 @@
 			part: 'productTable',
 			job: 'jobTable',
 			order: 'orderTable'
-			orderItem: 'orderItemTable'
+			orderItem: 'orderItemsTable'
 		};
 
 		// Separate fields for add operations (includes password)
@@ -1008,7 +1031,7 @@
 				'product': 'part',
 				'job': 'job',
 				'order': 'order'
-				'orderItem': 'orderItem'
+				'orderItem': 'order_item'
 			};
 			
 			formContext = tabMapping[activeTab] || activeTab;
@@ -1034,9 +1057,9 @@
 			editId = row.dataset.id;
 			formContext = context;
 			
-			// Get values from row (skip ID and Action columns)
-			const cells = Array.from(row.children)
-			const values = slice(1, -1).map(td => {
+			// Fix the cell extraction - was missing .slice() method call
+			const cells = Array.from(row.children).slice(1, -1); // Fix this line
+			const values = cells.map(td => {
 				let text = td.innerText.trim();
 				if (text.startsWith('$')) {
 					text = text.substring(1);
@@ -1044,7 +1067,14 @@
 				return text;
 			});
 			
-			generateForm(fields[context] || [], values);
+			// For order items, only extract the editable values (quantity and unit price)
+			let editableValues = values;
+			if (context === 'order_item') {
+				// Skip order number, customer, part name - only get quantity and unit price
+				editableValues = [values[3], values[4]]; // quantity and unit_price positions
+			}
+			
+			generateForm(fields[context] || [], editableValues);
 			document.getElementById('modalTitle').innerText = `Edit ${capitalize(context.replace('_', ' '))}`;
 			document.getElementById('formModal').classList.add('active');
 		}

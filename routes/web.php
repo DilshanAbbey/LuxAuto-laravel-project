@@ -55,7 +55,7 @@ Route::middleware(['auth', 'role:administrator,employee,technician'])->prefix('d
     Route::apiResource('service-bookings', App\Http\Controllers\Api\ServiceBookingController::class);
     Route::apiResource('customer-chats', App\Http\Controllers\Api\CustomerChatController::class);
     Route::apiResource('orders', App\Http\Controllers\Api\OrderController::class)->only(['index', 'show', 'update']);
-    Route::apiResource('order-items', App\Http\Controllers\Api\OrderItemController::class);
+    Route::apiResource('order-items', App\Http\Controllers\Api\OrderItemController::class)->except(['store']);
     Route::get('orders/{orderId}/items', [App\Http\Controllers\Api\OrderItemController::class, 'getByOrder']);
 });
 

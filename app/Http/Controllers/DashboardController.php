@@ -15,6 +15,7 @@ use App\Models\VehicleService;
 use App\Models\RepairBooking;
 use App\Models\ServiceBooking;
 use App\Models\CustomerChat;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -55,6 +56,7 @@ class DashboardController extends Controller
                 'repairBooking' => RepairBooking::with('customer')->get(),
                 'serviceBooking' => ServiceBooking::with('customer')->get(),
                 'customerChats' => CustomerChat::with(['customer', 'employee'])->get(),
+                'orderItems' => OrderItem::with(['order.user', 'part'])->get(),
             ];
         } elseif ($user->isEmployee()) {
             // Employees can see parts, bookings, vehicles, repairs/services, jobs
@@ -71,6 +73,7 @@ class DashboardController extends Controller
                 'repairBooking' => RepairBooking::with('customer')->get(),
                 'serviceBooking' => ServiceBooking::with('customer')->get(),
                 'customerChats' => collect(),
+                'orderItems' => OrderItem::with(['order.user', 'part'])->get(),
             ];
         } elseif ($user->isTechnician()) {
             // Technicians can only see their assigned jobs and job history
