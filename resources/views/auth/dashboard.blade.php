@@ -937,7 +937,7 @@
 				'Time': 'time',
 				'Description': 'description',
 				'Technician': 'technician'
-			}
+			},
 			order_item: {
 				'Quantity': 'quantity',
 				'Unit_Price': 'unit_price'
@@ -977,7 +977,7 @@
 			part: '/dashboard/parts',
 			job: '/dashboard/tasks', // Point to tasks endpoint
     		order: '/dashboard/orders'
-			order: '/dashboard/order-items'
+			order_item: '/dashboard/order-items'
 		};
 
 		const tableBodyIds = {
@@ -993,7 +993,7 @@
 			part: 'productTable',
 			job: 'jobTable',
 			order: 'orderTable'
-			orderItem: 'orderItemsTable'
+			order_item: 'orderItemsTable'
 		};
 
 		// Separate fields for add operations (includes password)
@@ -1013,9 +1013,31 @@
 		};
 
 		function showTab(id) {
-			tabIds.forEach(tab => document.getElementById(tab)?.classList.remove('active'));
-			document.getElementById(id)?.classList.add('active');
+			// Hide all tab content
+			tabIds.forEach(tab => {
+				const tabElement = document.getElementById(tab);
+				if (tabElement) {
+					tabElement.classList.remove('active');
+				}
+			});
+
+			// Remove active class from all tab buttons
+			document.querySelectorAll('.tab-button').forEach(btn => {
+				btn.classList.remove('active');
+			});
+
+			// Show the selected tab
+			const selectedTab = document.getElementById(id);
+			if (selectedTab) {
+				selectedTab.classList.add('active');
+			}
+			
+			// Add active class to clicked button
+			event.target.classList.add('active');
+			
+			// Update active tab tracking
 			activeTab = id.replace('Tab', '');
+
 			
 			// Map tab names to form contexts
 			const tabMapping = {
@@ -1031,7 +1053,7 @@
 				'product': 'part',
 				'job': 'job',
 				'order': 'order'
-				'orderItem': 'order_item'
+				'orderItems': 'order_item'
 			};
 			
 			formContext = tabMapping[activeTab] || activeTab;
