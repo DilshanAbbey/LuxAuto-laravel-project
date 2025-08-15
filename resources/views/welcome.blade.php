@@ -561,7 +561,6 @@
 
     async function sendMessage() {
         const input = document.getElementById('chatInput');
-        const customerIdInput = document.getElementById('chatCustomerId');
         const messages = document.getElementById('chatMessages');
         const message = input.value.trim();
         
@@ -587,6 +586,10 @@
                     return;
                 }
                 
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data.error || data.message || 'Unknown error'}`);
+                }
+                
                 if (data.success) {
                     // Add user message
                     const userDiv = document.createElement('div');
@@ -596,7 +599,6 @@
                     
                     // Clear input
                     input.value = '';
-                    customerIdInput.value = '';
                     
                     // Auto-response
                     setTimeout(() => {
@@ -613,7 +615,7 @@
                 console.error('Error sending message:', error);
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'bg-red-500 text-white p-3 rounded-lg mb-3';
-                errorDiv.innerHTML = `<strong>Error:</strong> Failed to send message. Please try again.`;
+                errorDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
                 messages.appendChild(errorDiv);
                 messages.scrollTop = messages.scrollHeight;
             }
@@ -650,6 +652,7 @@
                 shopButton.style.display = 'none';
             }
         } catch (error) {
+            console.error('Search error:', error);
             output.innerHTML = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">Error searching for part.</div>`;
             shopButton.style.display = 'none';
         }
@@ -670,7 +673,11 @@
 
     function renderBestSellers(items) {
         const container = document.getElementById('bestSellersContainer');
-        container.innerHTML = items.map(item => `
+        
+        // Duplicate the items to create a seamless loop
+        const duplicatedItems = [...items, ...items, ...items, ...items, ...items];
+        
+        container.innerHTML = duplicatedItems.map(item => `
             <div class="card bg-white rounded-lg shadow-md overflow-hidden product-card">
                 <img src="images/product-image.png" class="w-full product-image" alt="${item.partName}">
                 <div class="p-4">
@@ -691,7 +698,7 @@
         setTimeout(() => {
           document.getElementById("loader").style.display = "none";
           localStorage.setItem('hasVisitedWelcome', 'true');
-        }, 2000);
+        }, 5000);
       } else {
         document.getElementById("loader").style.display = "none";
       }

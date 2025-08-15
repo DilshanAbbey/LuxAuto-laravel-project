@@ -409,9 +409,7 @@
             <input type="password" name="password" class="w-full border-2 border-gray-300 rounded-xl py-4 px-5 text-base transition-all duration-300 bg-white bg-opacity-90 focus:border-accent focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white" id="registerPassword" placeholder="Password" required>
             <i class="fas fa-eye absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer transition-colors duration-300 hover:text-accent" id="registerPasswordToggle"></i>
             <div class="validation-message text-sm mt-1 transition-all duration-300" id="registerPasswordMsg"></div>
-            <div class="h-1 bg-gray-300 rounded-sm mt-2 overflow-hidden">
               <div class="h-full w-0 rounded-sm transition-all duration-300" id="strengthBar"></div>
-            </div>
           </div>
 
           <div class="relative mb-6">
@@ -616,11 +614,6 @@
     document.getElementById('registerPassword').addEventListener('input', function() {
       const password = this.value;
       const strengthBar = document.getElementById('strengthBar');
-      
-      if (password.length === 0) {
-        strengthBar.style.width = '0%';
-        return;
-      }
       
       const checks = validatePassword(password);
       const { strength, width } = getPasswordStrength(password);

@@ -16,31 +16,15 @@ use App\Http\Controllers\Api\ServiceBookingController;
 use App\Http\Controllers\Api\CustomerChatController;
 use App\Models\Part;
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('customers', CustomerController::class);
-    Route::apiResource('employees', EmployeeController::class);
-    Route::apiResource('parts', PartController::class);
-    Route::apiResource('tasks', JobController::class);
-    Route::apiResource('orders', JobController::class);
-    Route::apiResource('customer-deliveries', CustomerDeliveryController::class);
-    Route::apiResource('customer-vehicles', CustomerVehicleController::class);
-    Route::apiResource('vehicle-repairs', VehicleRepairController::class);
-    Route::apiResource('vehicle-services', VehicleServiceController::class);
-    Route::apiResource('repair-bookings', RepairBookingController::class);
-    Route::apiResource('service-bookings', ServiceBookingController::class);
-    Route::apiResource('customer-chats', CustomerChatController::class);
-    Route::apiResource('order-items', App\Http\Controllers\Api\OrderItemController::class);
-    Route::get('orders/{orderId}/items', [App\Http\Controllers\Api\OrderItemController::class, 'getByOrder']);
-});
-
+//Public routes (no middleware)
 Route::get('/products/top5', function () {
     return Part::orderBy('price', 'desc')
         ->take(5)
         ->get(['id', 'partName', 'brand', 'model', 'price']);
 });
 
-Route::get('/api/parts/search/{partNumber}', function ($partNumber) {
-    $part = Part::where('partNumber', 'LIKE', '%' . $partNumber . '%')->first();
+Route::get('/parts/search/{partNumber}', function ($partNumber) {
+    $part = \App\Models\Part::where('partNumber', 'LIKE', '%' . $partNumber . '%')->first();
     if ($part) {
         return response()->json([
             'found' => true,
@@ -61,8 +45,11 @@ Route::post('/api/customer-chat/store', function (Request $request) {
         return response()->json(['error' => 'Only customers can send messages'], 403);
     }
     
-    $customerChat = CustomerChat::create([
-        'idCustomer_Chat' => 'CHAT' . str_pad(CustomerChat::count() + 1, 4, '0', STR_PAD_LEFT),
+    $request->validate([
+        'message' => 'required|string'
+    ]);
+    
+    $customerChat = \App\Models\CustomerChat::create([
         'customer_id' => auth()->user()->original_id,
         'employee_id' => null,
         'date' => now()->format('Y-m-d'),
@@ -71,4 +58,41 @@ Route::post('/api/customer-chat/store', function (Request $request) {
     ]);
     
     return response()->json(['success' => true, 'message' => 'Message sent successfully']);
+});
+
+Route::get('/api/user', function() {
+    if (!auth()->check()) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    return response()->json(['user' => auth()->user()]);
+})->name('api.user');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('customers', CustomerController::class);
+    Route::apiResource('employees', EmployeeController::class);
+    Route::apiResource('parts', PartController::class);
+    Route::apiResource('tasks', JobController::class);
+    Route::apiResource('orders', JobController::class);
+    Route::apiResource('customer-deliveries', CustomerDeliveryController::class);
+    Route::apiResource('customer-vehicles', CustomerVehicleController::class);
+    Route::apiResource('vehicle-repairs', VehicleRepairController::class);
+    Route::apiResource('vehicle-services', VehicleServiceController::class);
+    Route::apiResource('repair-bookings', RepairBookingController::class);
+    Route::apiResource('service-bookings', ServiceBookingController::class);
+    Route::apiResource('customer-chats', CustomerChatController::class);
+    Route::apiResource('order-items', App\Http\Controllers\Api\OrderItemController::class);
+    Route::get('orders/{orderId}/items', [App\Http\Controllers\Api\OrderItemController::class, 'getByOrder']);
+});
+
+Route::get('/api/parts/search/{partNumber}', function ($partNumber) {
+    $part = Part::where('partNumber', 'LIKE', '%' . $partNumber . '%')->first();
+    if ($part) {
+        return response()->json([
+            'found' => true,
+            'partName' => $part->partName,
+            'brand' => $part->brand,
+            'model' => $part->model
+        ]);
+    }
+    return response()->json(['found' => false]);
 });

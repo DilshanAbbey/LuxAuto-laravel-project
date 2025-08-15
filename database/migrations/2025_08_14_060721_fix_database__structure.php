@@ -24,8 +24,9 @@ return new class extends Migration
             }
             if (!Schema::hasColumn('customer_vehicles', 'customer_id')) {
                 $table->unsignedBigInteger('customer_id');
-                $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+                $table->foreign('customer_id')->references('idCustomer')->on('customers')->onDelete('cascade');
             }
+
             if (!Schema::hasColumn('customer_vehicles', 'idCustomer_Vehicle')) {
                 $table->string('idCustomer_Vehicle')->unique()->after('id');
             }

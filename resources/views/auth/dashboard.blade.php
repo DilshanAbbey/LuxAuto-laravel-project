@@ -295,6 +295,7 @@
 		  <button onclick="showTab('productTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Product Management</button>
 		  <button onclick="showTab('jobTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Job Management</button>
 		  <button onclick="showTab('orderTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Order Management</button>
+		  <button onclick="showTab('orderItemsTab')" class="tab-button px-4 py-2 bg-white text-cyan-600 hover:bg-blue-600 hover:text-white rounded transition">Order Items Management</button>
 		</div>
 
 		<!-- Customer Management Tab -->
@@ -752,6 +753,29 @@
 				</tbody>
 			</table>
 		</div>
+
+		<!-- Order Items Management Tab -->
+		<div id="orderItemsTab" class="tab-content bg-white p-6 rounded shadow">
+		<h2 class="text-2xl font-bold text-purple-600 mb-4">Order Items Management</h2>
+			<table class="min-w-full divide-y divide-gray-200">
+				<thead>
+					<tr class="bg-gray-100 text-left text-gray-600">
+						<th class="px-4 py-2">Order Id</th>
+						<th class="px-4 py-2">Part Id</th>
+						<th class="px-4 py-2">Quantity</th>
+						<th class="px-4 py-2">Unit Price</th>
+						<th class="px-4 py-2">Total Price</th>
+						<th class="px-4 py-2">Action</th>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-gray-200" id="orderTable">
+					@foreach($data['orders'] as $order)
+					<tr data-id="{{ $order->id }}">
+					</tr>
+					@endforeach
+				</tbody>
+			</table>
+		</div>
 	  </main>
 	  
 	  <!-- Modal Template -->
@@ -791,7 +815,8 @@
 			'employeeTab',
 			'productTab',
 			'jobTab',
-			'orderTab'
+			'orderTab',
+			'orderItemsTab'
 		];
 		
 		const fields = {
@@ -929,6 +954,7 @@
 			part: '/dashboard/parts',
 			job: '/dashboard/tasks', // Point to tasks endpoint
     		order: '/dashboard/orders'
+			order: '/dashboard/orderItems'
 		};
 
 		const tableBodyIds = {
@@ -944,6 +970,7 @@
 			part: 'productTable',
 			job: 'jobTable',
 			order: 'orderTable'
+			orderItem: 'orderItemTable'
 		};
 
 		// Separate fields for add operations (includes password)
@@ -981,6 +1008,7 @@
 				'product': 'part',
 				'job': 'job',
 				'order': 'order'
+				'orderItem': 'orderItem'
 			};
 			
 			formContext = tabMapping[activeTab] || activeTab;
@@ -1217,7 +1245,7 @@
 				tabsToHide = [
 					'customerTab', 'customerDeliveryTab', 'employeeTab', 
 					'customerVehicleTab',
-					'repairBookingTab', 'serviceBookingTab', 'orderTab'
+					'repairBookingTab', 'serviceBookingTab', 'orderTab', 'orderItemsTab'
 				];
 				setTimeout(() => showTab('jobTab'), 100);
 			} else if (userRole === 'employee') {
