@@ -208,6 +208,28 @@
         display: none;
       }
     }
+
+    #card-element {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: white;
+    }
+
+    .StripeElement {
+      box-sizing: border-box;
+      height: 40px;
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background-color: white;
+      box-shadow: 0 1px 3px 0 #e6ebf1;
+      transition: box-shadow 150ms ease;
+    }
+
+    .StripeElement--focus {
+      box-shadow: 0 1px 3px 0 #cfd7df;
+    }
   </style>
 </head>
 <body class="bg-gray-100">
@@ -468,11 +490,14 @@
             </div>
           </div>
           
-          <h6 class="font-semibold mb-3">Payment Method</h6>
-          <div class="flex flex-wrap gap-2 mb-3">
-            <div class="payment-method selected border-2 border-blue-600 bg-blue-50 rounded-lg p-3 cursor-pointer" data-method="stripe">
-              <i class="fas fa-credit-card mr-2"></i>Credit Card (Stripe)
+          <h6 class="font-semibold mb-3">Payment Information</h6>
+          <!-- Stripe Elements Card Input -->
+          <div class="mb-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Card Details</label>
+            <div id="card-element" class="p-3 border border-gray-300 rounded-lg bg-white">
+              <!-- Stripe Elements will create form elements here -->
             </div>
+            <div id="card-errors" class="text-red-600 text-sm mt-2 hidden"></div>
           </div>
           
           <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-5">
@@ -955,11 +980,16 @@
       closeOffcanvas('cartOffcanvas');
       toggleOffcanvas('checkoutOffcanvas');
       
-      // Pre-populate user information
+      // Pre-populate user information and initialize Stripe Elements
       if (user) {
-        document.getElementById('fullName').value = user.name || '';
-        document.getElementById('email').value = user.email || '';
+        // User info is already loaded, no fields to populate for shipping-only form
       }
+      
+      // Initialize Stripe Elements after the offcanvas is shown
+      setTimeout(() => {
+        initializeStripeElements();
+        loadAddressesInCheckout();
+      }, 100);
     }
 
     // Updated process payment function
@@ -994,15 +1024,13 @@
           throw new Error(intentData.error || 'Failed to create payment intent');
         }
 
-        // For demo purposes - in production, you'd collect real card details
-        // Confirm payment with Stripe
-        const { error } = await stripe.confirmCardPayment(intentData.client_secret, {
+        // Confirm payment with Stripe Elements
+        const { error, paymentIntent } = await stripe.confirmCardPayment(intentData.client_secret, {
           payment_method: {
-            card: {
-              number: '4242424242424242',
-              exp_month: 12,
-              exp_year: 2025,
-              cvc: '123'
+            card: cardElement,
+            billing_details: {
+              name: user?.name || 'Customer',
+              email: user?.email || '',
             }
           }
         });
@@ -1011,36 +1039,16 @@
           throw new Error(error.message);
         }
 
-        // Confirm the order
-        const confirmResponse = await fetch('/api/payment/confirm', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': getCSRFToken()
-          },
-          body: JSON.stringify({
-            payment_intent_id: intentData.client_secret.split('_secret_')[0],
-            ...addressData
-          })
-        });
+        if (paymentIntent.status === 'succeeded') {
+          // Confirm the order
+          // Success! Clear cart and show confirmation
+          cart = [];
+          updateCartBadge();
+          updateCartDisplay();
+          closeOffcanvas('checkoutOffcanvas');
 
-        const orderResult = await confirmResponse.json();
-        
-        if (!confirmResponse.ok) {
-          throw new Error(orderResult.error || 'Failed to confirm order');
+          alert(`Order placed successfully! Order number: ${orderResult.order.order_number}`);
         }
-
-        // Success! Clear cart and show confirmation
-        cart = [];
-        updateCartBadge();
-        updateCartDisplay();
-        closeOffcanvas('checkoutOffcanvas');
-        
-        // Reload addresses to include the new one
-        await loadUserAddresses();
-        
-        alert(`Order placed successfully! Order number: ${orderResult.order.order_number}`);
         
       } catch (error) {
         console.error('Payment failed:', error);
@@ -1065,6 +1073,41 @@
       }
       
       renderProducts();
+    }
+
+    // Initialize Stripe Elements
+    let elements;
+    let cardElement;
+
+    // Initialize Stripe Elements when checkout opens
+    function initializeStripeElements() {
+      elements = stripe.elements();
+      
+      cardElement = elements.create('card', {
+        style: {
+          base: {
+            fontSize: '16px',
+            color: '#424770',
+            '::placeholder': {
+              color: '#aab7c4',
+            },
+          },
+        },
+      });
+      
+      cardElement.mount('#card-element');
+      
+      // Handle card validation errors
+      cardElement.on('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+          displayError.textContent = event.error.message;
+          displayError.classList.remove('hidden');
+        } else {
+          displayError.textContent = '';
+          displayError.classList.add('hidden');
+        }
+      });
     }
 
     // Initialize Stripe

@@ -207,31 +207,6 @@
     .strength-medium { background: #ffc107; }
     .strength-strong { background: #28a745; }
 
-    @keyframes loadBar {
-      0% { width: 0; }
-      100% { width: 100%; }
-    }
-
-    @keyframes roll {
-      0% { transform: rotate(0); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .tire {
-      width: 100px;
-      height: 100px;
-      background: url('images/tire_rotating-removebg-preview.png') center/contain no-repeat;
-      animation: roll 2s linear infinite;
-    }
-
-    .loader-bar {
-      height: 100%;
-      width: 0;
-      background-color: #007bff;
-      animation: loadBar 2s ease-in-out forwards;
-      border-radius: 5px;
-    }
-
     .social-btn:hover {
       transform: translateY(-3px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -277,15 +252,6 @@
   </style>
 </head>
 <body class="bg-primary-bg text-gray-800 font-sans">
-  <!-- Loader -->
-  <div class="fixed top-0 left-0 w-full h-screen bg-primary-bg flex items-center justify-center z-50" id="loader">
-    <div>
-      <div class="tire mx-auto"></div>
-      <div class="w-48 h-2.5 bg-blue-100 rounded-full overflow-hidden mx-auto mt-4">
-        <div class="loader-bar"></div>
-      </div>
-    </div>
-  </div>
 
   <!-- Navigation -->
   <header class="p-3 bg-blue-500">
@@ -708,13 +674,6 @@
       btn.querySelector('span').textContent = 'Creating Account...';
       
       // Let Laravel handle the form submission - no preventDefault
-    });
-
-    // Loader
-    window.addEventListener("load", () => {
-      setTimeout(() => {
-        document.getElementById("loader").style.display = "none";
-      }, 2000);
     });
   </script>
 </body>
