@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>LuxAuto</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -456,6 +457,9 @@
         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">Search</button>
       </form>
       <div id="partInfo" class="mt-3"></div>
+      <div id="shopButton" class="mt-2" style="display: none;">
+        <a href="/shop" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">Go to Shop</a>
+      </div>
     </div>
 
     <!-- Best Sellers Section -->
@@ -464,7 +468,9 @@
         <h2 class="best-sellers-title">Best Sellers</h2>
         <div class="scroll-wrapper">
           <div class="scroll-boxes-container scroll-boxes">
-            <div id="bestSellersGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"></div> //here, we need to include the top 5 part info
+            <div class="scroll-boxes" id="bestSellersContainer">
+              <!-- Dynamic content will be loaded here -->
+            </div>
           </div>
         </div>
       </div>
@@ -511,7 +517,6 @@
         </div>
       </div>
       <div class="chat-input-area">
-        <textarea class="chat-input" id="chatCustomerId" placeholder="Enter your Customer Id..." rows="1"></textarea>
         <textarea class="chat-input" id="chatInput" placeholder="Describe your mechanical issue..." rows="2"></textarea>
         <button class="send-btn" onclick="sendMessage()">Send Message</button>
       </div>
@@ -530,8 +535,22 @@
       mobileMenu.classList.toggle('hidden');
     }
 
-    function openChat() {
-      document.getElementById('chatModal').style.display = 'block';
+    async function openChat() {
+        // Check if user is logged in
+        try {
+            const response = await fetch('/api/user');
+            if (response.status === 401) {
+                alert('Please login or register to use the chat feature.');
+                window.location.href = '/loginregister';
+                return;
+            }
+        } catch (error) {
+            alert('Please login or register to use the chat feature.');
+            window.location.href = '/loginregister';
+            return;
+        }
+        
+        document.getElementById('chatModal').style.display = 'block';
     }
 
     function closeChat(event) {
@@ -540,35 +559,65 @@
       }
     }
 
-    function sendMessage() {
-      const input = document.getElementById('chatInput');
-      const customerIdInput = document.getElementById('chatCustomerId');
-      const messages = document.getElementById('chatMessages');
-      const message = input.value.trim();
-      
-      if (message) {
-        // Add user message
-        const userDiv = document.createElement('div');
-        userDiv.className = 'bg-blue-500 text-white p-3 rounded-lg mb-3 ml-12 text-right';
-        userDiv.innerHTML = `<strong>You:</strong> ${message}`;
-        messages.appendChild(userDiv);
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const customerIdInput = document.getElementById('chatCustomerId');
+        const messages = document.getElementById('chatMessages');
+        const message = input.value.trim();
         
-        // Auto-scroll to bottom
-        messages.scrollTop = messages.scrollHeight;
-        
-        // Clear input
-        input.value = '';
-        customerIdInput.value = '';
-        
-        // Simulate technician response
-        setTimeout(() => {
-          const techDiv = document.createElement('div');
-          techDiv.className = 'bg-gray-200 p-3 rounded-lg mb-3';
-          techDiv.innerHTML = `<strong>Technician Mike:</strong> Thanks for your message! I'll analyze your issue and get back to you with specific solutions and recommendations.`;
-          messages.appendChild(techDiv);
-          messages.scrollTop = messages.scrollHeight;
-        }, 1500);
-      }
+        if (message) {
+            try {
+                const response = await fetch('/api/customer-chat/store', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                if (response.status === 401) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'bg-red-500 text-white p-3 rounded-lg mb-3';
+                    errorDiv.innerHTML = `<strong>System:</strong> Please login or register to send messages.`;
+                    messages.appendChild(errorDiv);
+                    messages.scrollTop = messages.scrollHeight;
+                    return;
+                }
+                
+                if (data.success) {
+                    // Add user message
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'bg-blue-500 text-white p-3 rounded-lg mb-3 ml-12 text-right';
+                    userDiv.innerHTML = `<strong>You:</strong> ${message}`;
+                    messages.appendChild(userDiv);
+                    
+                    // Clear input
+                    input.value = '';
+                    customerIdInput.value = '';
+                    
+                    // Auto-response
+                    setTimeout(() => {
+                        const techDiv = document.createElement('div');
+                        techDiv.className = 'bg-gray-200 p-3 rounded-lg mb-3';
+                        techDiv.innerHTML = `<strong>Support:</strong> Thank you for your message! Our team will review your inquiry and reach out to you soon.`;
+                        messages.appendChild(techDiv);
+                        messages.scrollTop = messages.scrollHeight;
+                    }, 1000);
+                }
+                
+                messages.scrollTop = messages.scrollHeight;
+            } catch (error) {
+                console.error('Error sending message:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bg-red-500 text-white p-3 rounded-lg mb-3';
+                errorDiv.innerHTML = `<strong>Error:</strong> Failed to send message. Please try again.`;
+                messages.appendChild(errorDiv);
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }
     }
 
     // Allow Enter key to send message
@@ -579,30 +628,31 @@
       }
     });
 
-    document.getElementById('chatCustomerId').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
+    document.getElementById("searchForm").addEventListener("submit", async function (e) {
         e.preventDefault();
-        sendMessage();
-      }
-    });
-
-    const fakeDatabase = {
-      "AX123": { name: "Brake Pad AX123", brand: "Toyota", price: "$45" },
-      "BX200": { name: "Oil Filter BX200", brand: "Nissan", price: "$18" },
-      "CX300": { name: "Spark Plug CX300", brand: "Honda", price: "$12" },
-      "DX400": { name: "Air Filter DX400", brand: "Ford", price: "$22" }
-    };
-
-    document.getElementById("searchForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const partNumber = document.getElementById("partNumber").value.trim().toUpperCase();
-      const part = fakeDatabase[partNumber];
-      const output = document.getElementById("partInfo");
-      if (part) {
-        output.innerHTML = `<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded"><strong>${part.name}</strong><br>Brand: ${part.brand}<br>Price: ${part.price}</div>`;
-      } else {
-        output.innerHTML = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">Part not found. Try: AX123, BX200, CX300, or DX400</div>`;
-      }
+        const partNumber = document.getElementById("partNumber").value.trim();
+        const output = document.getElementById("partInfo");
+        const shopButton = document.getElementById("shopButton");
+        
+        try {
+            const response = await fetch(`/api/parts/search/${partNumber}`);
+            const data = await response.json();
+            
+            if (data.found) {
+                output.innerHTML = `<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                    <strong>${data.partName}</strong><br>
+                    Brand: ${data.brand}<br>
+                    Model: ${data.model}
+                </div>`;
+                shopButton.style.display = 'block';
+            } else {
+                output.innerHTML = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">Part not found.</div>`;
+                shopButton.style.display = 'none';
+            }
+        } catch (error) {
+            output.innerHTML = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">Error searching for part.</div>`;
+            shopButton.style.display = 'none';
+        }
     });
 
     async function loadBestSellers() {
@@ -614,18 +664,20 @@
             renderBestSellers(bestSellers);
         } catch (err) {
             console.error(err);
-            document.getElementById('bestSellers').innerHTML = `<p>Failed to load best sellers</p>`;
+            document.getElementById('bestSellersContainer').innerHTML = `<p>Failed to load best sellers</p>`;
         }
     }
 
     function renderBestSellers(items) {
-        const container = document.getElementById('bestSellers');
+        const container = document.getElementById('bestSellersContainer');
         container.innerHTML = items.map(item => `
-            <div class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                <img src="${item.image}" class="w-full h-48 object-cover" alt="${item.partName}">
+            <div class="card bg-white rounded-lg shadow-md overflow-hidden product-card">
+                <img src="images/product-image.png" class="w-full product-image" alt="${item.partName}">
                 <div class="p-4">
                     <h5 class="font-semibold text-lg mb-1">${item.partName}</h5>
-                    <p class="text-gray-600 text-sm">${item.brand} - ${item.model}</p>
+                    <p class="text-gray-600 text-sm">${item.brand}</p>
+                    <p class="text-gray-600 text-sm">${item.model}</p>
+                    <p class="text-blue-600 font-bold">$${item.price}</p>
                 </div>
             </div>
         `).join('');
@@ -634,9 +686,15 @@
     document.addEventListener('DOMContentLoaded', loadBestSellers);
 
     window.addEventListener("load", () => {
-      setTimeout(() => {
+      const hasVisited = localStorage.getItem('hasVisitedWelcome');
+      if (!hasVisited) {
+        setTimeout(() => {
+          document.getElementById("loader").style.display = "none";
+          localStorage.setItem('hasVisitedWelcome', 'true');
+        }, 2000);
+      } else {
         document.getElementById("loader").style.display = "none";
-      }, 2000);
+      }
     });
   </script>
 </body>

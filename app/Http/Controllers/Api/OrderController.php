@@ -68,4 +68,16 @@ class OrderController extends Controller
             'data' => $order
         ]);
     }
+
+    public function items(Order $order)
+    {
+        $user = auth()->user();
+        
+        if (!$user->isAdministrator() && !$user->isEmployee()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $orderItems = $order->orderItems()->with('part')->get();
+        return response()->json($orderItems);
+    }
 }

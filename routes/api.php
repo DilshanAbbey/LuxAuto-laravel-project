@@ -29,10 +29,46 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('repair-bookings', RepairBookingController::class);
     Route::apiResource('service-bookings', ServiceBookingController::class);
     Route::apiResource('customer-chats', CustomerChatController::class);
+    Route::apiResource('order-items', App\Http\Controllers\Api\OrderItemController::class);
+    Route::get('orders/{orderId}/items', [App\Http\Controllers\Api\OrderItemController::class, 'getByOrder']);
 });
 
 Route::get('/products/top5', function () {
     return Part::orderBy('price', 'desc')
         ->take(5)
-        ->get(['partName', 'brand', 'model']);
+        ->get(['id', 'partName', 'brand', 'model', 'price']);
+});
+
+Route::get('/api/parts/search/{partNumber}', function ($partNumber) {
+    $part = Part::where('partNumber', 'LIKE', '%' . $partNumber . '%')->first();
+    if ($part) {
+        return response()->json([
+            'found' => true,
+            'partName' => $part->partName,
+            'brand' => $part->brand,
+            'model' => $part->model
+        ]);
+    }
+    return response()->json(['found' => false]);
+});
+
+Route::post('/api/customer-chat/store', function (Request $request) {
+    if (!auth()->check()) {
+        return response()->json(['error' => 'Please login first'], 401);
+    }
+    
+    if (!auth()->user()->isCustomer()) {
+        return response()->json(['error' => 'Only customers can send messages'], 403);
+    }
+    
+    $customerChat = CustomerChat::create([
+        'idCustomer_Chat' => 'CHAT' . str_pad(CustomerChat::count() + 1, 4, '0', STR_PAD_LEFT),
+        'customer_id' => auth()->user()->original_id,
+        'employee_id' => null,
+        'date' => now()->format('Y-m-d'),
+        'description' => $request->message,
+        'status' => 'not resolved'
+    ]);
+    
+    return response()->json(['success' => true, 'message' => 'Message sent successfully']);
 });
