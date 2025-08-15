@@ -23,21 +23,10 @@
   </script>
   <style>
     body {
-      background-image: url('images/stretch-image5.png');
+      background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/stretch-image5.png');
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
-    }
-
-    body::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1;
     }
 
     body > * {
@@ -99,10 +88,6 @@
       background-color: #007bff;
       color: white;
       transform: translateY(-2px);
-    }
-    
-    .success-animation {
-      animation: pulse 0.6s ease-in-out;
     }
     
     @keyframes pulse {
@@ -273,21 +258,21 @@
   </header>
   
   <!-- Menu Icons -->
-  <div class="flex items-center ml-3 mr-3 space-x-2 bg-black opacity-70">
+<div class="fixed bottom-6 right-6 flex flex-col space-y-3 z-50">
     <!-- Shopping Cart -->
-    <div class="menu-icon relative p-2 rounded-lg text-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer" onclick="toggleOffcanvas('cartOffcanvas')">
-      <i class="fas fa-shopping-cart text-lg"></i>
-      <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" id="cartBadge">0</span>
+    <div class="menu-icon relative p-4 rounded-full text-white bg-blue-600 hover:bg-blue-500 cursor-pointer transition-all duration-300 shadow-2xl hover:shadow-blue-500/50" onclick="toggleOffcanvas('cartOffcanvas')">
+      <i class="fas fa-shopping-cart text-xl"></i>
+      <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-lg" id="cartBadge">0</span>
     </div>
     
     <!-- Account Settings -->
-    <div class="menu-icon p-2 rounded-lg text-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer" onclick="toggleOffcanvas('settingsOffcanvas')">
-      <i class="fas fa-cog text-lg"></i>
+    <div class="menu-icon p-4 rounded-full text-white bg-purple-600 hover:bg-purple-500 cursor-pointer transition-all duration-300 shadow-2xl hover:shadow-purple-500/50" onclick="toggleOffcanvas('settingsOffcanvas')">
+        <i class="fas fa-cog text-xl"></i>
     </div>
     
     <!-- Account Info -->
-    <div class="menu-icon p-2 rounded-lg text-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer" onclick="toggleOffcanvas('accountOffcanvas')">
-      <i class="fas fa-user text-lg"></i>
+    <div class="menu-icon p-4 rounded-full text-white bg-green-600 hover:bg-green-500 cursor-pointer transition-all duration-300 shadow-2xl hover:shadow-green-500/50" onclick="toggleOffcanvas('accountOffcanvas')">
+        <i class="fas fa-user text-xl"></i>
     </div>
   </div>
 
@@ -708,13 +693,6 @@
         await loadCart();
         updateCartBadge();
         updateCartDisplay();
-        
-        // Show success animation
-        const button = event.target.closest('button');
-        if (button) {
-          button.classList.add('success-animation');
-          setTimeout(() => button.classList.remove('success-animation'), 600);
-        }
         
       } catch (error) {
         console.error('Failed to add to cart:', error);
