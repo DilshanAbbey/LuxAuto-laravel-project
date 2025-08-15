@@ -36,30 +36,6 @@ Route::get('/parts/search/{partNumber}', function ($partNumber) {
     return response()->json(['found' => false]);
 });
 
-Route::post('/api/customer-chat/store', function (Request $request) {
-    if (!auth()->check()) {
-        return response()->json(['error' => 'Please login first'], 401);
-    }
-    
-    if (!auth()->user()->isCustomer()) {
-        return response()->json(['error' => 'Only customers can send messages'], 403);
-    }
-    
-    $request->validate([
-        'message' => 'required|string'
-    ]);
-    
-    $customerChat = \App\Models\CustomerChat::create([
-        'customer_id' => auth()->user()->original_id,
-        'employee_id' => null,
-        'date' => now()->format('Y-m-d'),
-        'description' => $request->message,
-        'status' => 'not resolved'
-    ]);
-    
-    return response()->json(['success' => true, 'message' => 'Message sent successfully']);
-});
-
 Route::get('/api/user', function() {
     if (!auth()->check()) {
         return response()->json(['error' => 'Unauthorized'], 401);
@@ -82,6 +58,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('customer-chats', CustomerChatController::class);
     Route::apiResource('order-items', App\Http\Controllers\Api\OrderItemController::class);
     Route::get('orders/{orderId}/items', [App\Http\Controllers\Api\OrderItemController::class, 'getByOrder']);
+
+    Route::post('/api/customer-chat/store', function (Request $request) {
+    });
 });
 
 Route::get('/api/parts/search/{partNumber}', function ($partNumber) {

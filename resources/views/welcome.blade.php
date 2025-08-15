@@ -536,22 +536,35 @@
     }
 
     async function openChat() {
-        // Check if user is logged in
         try {
-            const response = await fetch('/api/user');
+            const response = await fetch('/api/user', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+            
             if (response.status === 401) {
                 alert('Please login or register to use the chat feature.');
                 window.location.href = '/loginregister';
                 return;
             }
+            
+            const data = await response.json();
+            if (data.user && data.user.role !== 'customer') {
+                alert('Chat feature is only available for customers.');
+                return;
+            }
+            
         } catch (error) {
+            console.error('Auth check failed:', error);
             alert('Please login or register to use the chat feature.');
             window.location.href = '/loginregister';
             return;
         }
         
         document.getElementById('chatModal').style.display = 'block';
-    }
+}
 
     function closeChat(event) {
       if (!event || event.target === document.getElementById('chatModal')) {
@@ -564,62 +577,74 @@
         const messages = document.getElementById('chatMessages');
         const message = input.value.trim();
         
-        if (message) {
-            try {
-                const response = await fetch('/api/customer-chat/store', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({ message: message })
-                });
-                
-                const data = await response.json();
-                
-                if (response.status === 401) {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'bg-red-500 text-white p-3 rounded-lg mb-3';
-                    errorDiv.innerHTML = `<strong>System:</strong> Please login or register to send messages.`;
-                    messages.appendChild(errorDiv);
-                    messages.scrollTop = messages.scrollHeight;
-                    return;
-                }
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${data.error || data.message || 'Unknown error'}`);
-                }
-                
-                if (data.success) {
-                    // Add user message
-                    const userDiv = document.createElement('div');
-                    userDiv.className = 'bg-blue-500 text-white p-3 rounded-lg mb-3 ml-12 text-right';
-                    userDiv.innerHTML = `<strong>You:</strong> ${message}`;
-                    messages.appendChild(userDiv);
-                    
-                    // Clear input
-                    input.value = '';
-                    
-                    // Auto-response
-                    setTimeout(() => {
-                        const techDiv = document.createElement('div');
-                        techDiv.className = 'bg-gray-200 p-3 rounded-lg mb-3';
-                        techDiv.innerHTML = `<strong>Support:</strong> Thank you for your message! Our team will review your inquiry and reach out to you soon.`;
-                        messages.appendChild(techDiv);
-                        messages.scrollTop = messages.scrollHeight;
-                    }, 1000);
-                }
-                
-                messages.scrollTop = messages.scrollHeight;
-            } catch (error) {
-                console.error('Error sending message:', error);
+        if (!message) return;
+        
+        // Add user message immediately
+        const userDiv = document.createElement('div');
+        userDiv.className = 'bg-blue-500 text-white p-3 rounded-lg mb-3 ml-12 text-right';
+        userDiv.innerHTML = `<strong>You:</strong> ${message}`;
+        messages.appendChild(userDiv);
+        
+        // Clear input
+        input.value = '';
+        messages.scrollTop = messages.scrollHeight;
+        
+        try {
+            const response = await fetch('/api/customer-chat/store', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
+            
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Server returned non-JSON response. Please check if you are logged in.');
+            }
+            
+            const data = await response.json();
+            
+            if (response.status === 401) {
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'bg-red-500 text-white p-3 rounded-lg mb-3';
-                errorDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+                errorDiv.innerHTML = `<strong>System:</strong> Please login or register to send messages.`;
                 messages.appendChild(errorDiv);
-                messages.scrollTop = messages.scrollHeight;
+                
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/loginregister';
+                }, 2000);
+                return;
             }
+            
+            if (!response.ok) {
+                throw new Error(data.error || data.message || `HTTP ${response.status}`);
+            }
+            
+            if (data.success) {
+                // Auto-response
+                setTimeout(() => {
+                    const techDiv = document.createElement('div');
+                    techDiv.className = 'bg-gray-200 p-3 rounded-lg mb-3';
+                    techDiv.innerHTML = `<strong>Support:</strong> Thank you for your message! Our team will review your inquiry and get back to you soon.`;
+                    messages.appendChild(techDiv);
+                    messages.scrollTop = messages.scrollHeight;
+                }, 1000);
+            }
+            
+        } catch (error) {
+            console.error('Error sending message:', error);
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'bg-red-500 text-white p-3 rounded-lg mb-3';
+            errorDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+            messages.appendChild(errorDiv);
         }
+        
+        messages.scrollTop = messages.scrollHeight;
     }
 
     // Allow Enter key to send message

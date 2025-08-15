@@ -6,102 +6,52 @@ use App\Http\Controllers\Controller;
 use App\Models\CustomerChat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class CustomerChatController extends Controller
 {
-    public function index()
-    {
-        if (!auth()->user()->isAdministrator()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $chats = CustomerChat::with(['customer', 'employee'])->get();
-        return response()->json($chats);
-    }
-
     public function store(Request $request)
     {
-        if (!auth()->user()->isAdministrator()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Please login first'], 401);
         }
-
+        
+        if (!auth()->user()->isCustomer()) {
+            return response()->json(['error' => 'Only customers can send messages'], 403);
+        }
+        
         $validator = Validator::make($request->all(), [
-            'customer_id' => 'required|exists:customers,id',
-            'employee_id' => 'required|exists:employees,id',
-            'date' => 'required|date',
-            'description' => 'required|string',
-            'status' => 'required|string|max:255'
+            'message' => 'required|string|max:1000'
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
+                'message' => 'Validation failed',
                 'errors' => $validator->errors()
             ], 422);
         }
-
-        $chat = CustomerChat::create([
-            'idCustomer_Chat' => $request->id,
-            'customer_id' => $request->customer_id,
-            'employee_id' => $request->employee_id,
-            'date' => $request->date,
-            'description' => $request->description,
-            'status' => $request->status
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Customer chat created successfully',
-            'data' => $chat->load(['customer', 'employee'])
-        ]);
-    }
-
-    public function update(Request $request, CustomerChat $customerChat)
-    {
-        if (!auth()->user()->isAdministrator()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'customer_id' => 'required|exists:customers,id',
-            'employee_id' => 'required|exists:employees,id',
-            'date' => 'required|date',
-            'description' => 'required|string',
-            'status' => 'required|string|max:255'
-        ]);
-
-        if ($validator->fails()) {
+        
+        try {
+            $customerChat = CustomerChat::create([
+                'customer_id' => auth()->user()->original_id,
+                'employee_id' => null,
+                'date' => now()->format('Y-m-d'),
+                'description' => $request->input('message'),
+                'status' => 'not resolved'
+            ]);
+            
+            return response()->json([
+                'success' => true, 
+                'message' => 'Message sent successfully',
+                'data' => $customerChat
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Chat message error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+                'error' => 'Failed to send message. Please try again.'
+            ], 500);
         }
-
-        $customerChat->update($request->only([
-            'customer_id', 'employee_id', 'date', 
-            'description', 'status'
-        ]));
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Customer chat updated successfully',
-            'data' => $customerChat->load(['customer', 'employee'])
-        ]);
-    }
-
-    public function destroy(CustomerChat $customerChat)
-    {
-        if (!auth()->user()->isAdministrator()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $customerChat->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Customer chat deleted successfully'
-        ]);
     }
 }

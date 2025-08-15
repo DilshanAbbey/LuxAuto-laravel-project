@@ -85,4 +85,6 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::put('/api/customer/addresses/{id}', [App\Http\Controllers\Api\CustomerAddressController::class, 'update']);
     Route::delete('/api/customer/addresses/{id}', [App\Http\Controllers\Api\CustomerAddressController::class, 'destroy']);
 
+    Route::post('/api/customer-chat/store', [App\Http\Controllers\Api\CustomerChatController::class, 'store']);
+
 });

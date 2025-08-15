@@ -460,14 +460,14 @@
 			<tbody class="divide-y divide-gray-200" id="repairBookingTable">
 				@foreach($data['repairBooking'] as $repairBook)
 				<tr data-id="{{ $repairBook->id }}">
-					<td class="px-4 py-2">{{ $repairBook->idRepair_booking }}</td>
+					<td class="px-4 py-2">{{ $repairBook->idRepair_booking ?? $repairBook->id }}</td>
 					<td class="px-4 py-2">{{ $repairBook->slotNumber }}</td>
-					<td class="px-4 py-2">{{ $repairBook->customer->id }}</td>
+					<td class="px-4 py-2">{{ $repairBook->customer->customerName ?? $repairBook->customer->idCustomer }}</td>
 					<td class="px-4 py-2">{{ $repairBook->date->format('Y-m-d') }}</td>
-					<td class="px-4 py-2">{{ $repairBook->technician_in_charge }}</td>
+					<td class="px-4 py-2">{{ $repairBook->technician_in_charge ?? $repairBook->technician }}</td>
 					<td class="px-4 py-2">
-						<button onclick="editRow(this, 'repair_booking')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-    					<button onclick="deleteRow(this, 'repair_booking')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+					<button onclick="editRow(this, 'repair_booking')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+					<button onclick="deleteRow(this, 'repair_booking')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
 					</td>
 				</tr>
 				@endforeach
@@ -530,14 +530,14 @@
 			<tbody class="divide-y divide-gray-200" id="serviceBookingTable">
 				@foreach($data['serviceBooking'] as $serviceBook)
 				<tr data-id="{{ $serviceBook->id }}">
-					<td class="px-4 py-2">{{ $serviceBook->idService_booking }}</td>
+					<td class="px-4 py-2">{{ $serviceBook->idService_booking ?? $serviceBook->id }}</td>
 					<td class="px-4 py-2">{{ $serviceBook->slotNumber }}</td>
-					<td class="px-4 py-2">{{ $serviceBook->customer->id}}</td>
-					<td class="px-4 py-2">{{ $serviceBook->date->format('Y-m-d')}}</td>
+					<td class="px-4 py-2">{{ $serviceBook->customer->customerName ?? $serviceBook->customer->idCustomer }}</td>
+					<td class="px-4 py-2">{{ $serviceBook->date->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $serviceBook->technician }}</td>
 					<td class="px-4 py-2">
-						<button onclick="editRow(this, 'service_booking')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-           				<button onclick="deleteRow(this, 'service_booking')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+					<button onclick="editRow(this, 'service_booking')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+					<button onclick="deleteRow(this, 'service_booking')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
 					</td>
 				</tr>
 				@endforeach
@@ -565,14 +565,14 @@
 				@foreach($data['customerChats'] as $chat)
 				<tr data-id="{{ $chat->id }}">
 					<td class="px-4 py-2">{{ $chat->id }}</td>
-					<td class="px-4 py-2">{{ $chat->customer->idCustomer }}</td>
+					<td class="px-4 py-2">{{ $chat->customer->customerName ?? $chat->customer->idCustomer }}</td>
 					<td class="px-4 py-2">{{ $chat->date->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $chat->description }}</td>
-					<td class="px-4 py-2">{{ $chat->employee->employeeName }}</td>
+					<td class="px-4 py-2">{{ $chat->employee->employeeName ?? 'Unassigned' }}</td>
 					<td class="px-4 py-2">{{ $chat->status }}</td>
 					<td class="px-4 py-2">
-						<button onclick="editRow(this, 'customer_chat')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-						<button onclick="deleteRow(this, 'customer_chat')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+					<button onclick="editRow(this, 'customer_chat')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+					<button onclick="deleteRow(this, 'customer_chat')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
 					</td>
 				</tr>
 				@endforeach
@@ -755,28 +755,44 @@
 		</div>
 
 		<!-- Order Items Management Tab -->
-		<tbody class="divide-y divide-gray-200" id="orderItemsTable">
+		<div id="orderItemsTab" class="tab-content bg-white p-6 rounded shadow">
+		<h2 class="text-2xl font-bold text-purple-600 mb-4">Order Items Management</h2>
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead>
+			<tr class="bg-gray-100 text-left text-gray-600">
+				<th class="px-4 py-2">Order Number</th>
+				<th class="px-4 py-2">Customer Name</th>
+				<th class="px-4 py-2">Part Name</th>
+				<th class="px-4 py-2">Quantity</th>
+				<th class="px-4 py-2">Unit Price</th>
+				<th class="px-4 py-2">Total Price</th>
+				<th class="px-4 py-2">Action</th>
+			</tr>
+			</thead>
+			<tbody class="divide-y divide-gray-200" id="orderItemsTable">
 			@if(isset($data['orderItems']) && $data['orderItems']->count() > 0)
 				@foreach($data['orderItems'] as $item)
 				<tr data-id="{{ $item->id }}">
-					<td class="px-4 py-2">{{ $item->order->order_number ?? 'N/A' }}</td>
-					<td class="px-4 py-2">{{ $item->order->user->name ?? 'N/A' }}</td>
-					<td class="px-4 py-2">{{ $item->part->partName ?? 'N/A' }}</td>
-					<td class="px-4 py-2">{{ $item->quantity }}</td>
-					<td class="px-4 py-2">${{ $item->unit_price }}</td>
-					<td class="px-4 py-2">${{ $item->total_price }}</td>
-					<td class="px-4 py-2">
-						<button onclick="editRow(this, 'order_item')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-						<button onclick="deleteRow(this, 'order_item')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
-					</td>
+				<td class="px-4 py-2">{{ $item->order->order_number ?? 'N/A' }}</td>
+				<td class="px-4 py-2">{{ $item->order->user->name ?? 'N/A' }}</td>
+				<td class="px-4 py-2">{{ $item->part->partName ?? 'N/A' }}</td>
+				<td class="px-4 py-2">{{ $item->quantity }}</td>
+				<td class="px-4 py-2">${{ $item->unit_price }}</td>
+				<td class="px-4 py-2">${{ $item->total_price }}</td>
+				<td class="px-4 py-2">
+					<button onclick="editRow(this, 'order_item')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+					<button onclick="deleteRow(this, 'order_item')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+				</td>
 				</tr>
 				@endforeach
 			@else
 				<tr>
-					<td colspan="7" class="px-4 py-2 text-center text-gray-500">No order items found</td>
+				<td colspan="7" class="px-4 py-2 text-center text-gray-500">No order items found</td>
 				</tr>
 			@endif
-		</tbody>
+			</tbody>
+		</table>
+		</div>
 	  </main>
 	  
 	  <!-- Modal Template -->
@@ -887,7 +903,6 @@
 				'Service_Date': 'serviceDate',
 				'Description': 'description',
 				'Price': 'price',
-				'Next_Service_Date': 'nextServiceDate',
 				'Technician': 'technician'
 			},
 			repair_booking: {
@@ -1056,32 +1071,80 @@
 		}
 
 		function editRow(btn, context) {
-			const row = btn.closest('tr');
-			editTargetRow = row;
-			editMode = true;
-			editId = row.dataset.id;
-			formContext = context;
-			
-			// Fix the cell extraction - was missing .slice() method call
-			const cells = Array.from(row.children).slice(1, -1); // Fix this line
-			const values = cells.map(td => {
+		const row = btn.closest('tr');
+		editTargetRow = row;
+		editMode = true;
+		editId = row.dataset.id;
+		formContext = context;
+		
+		const cells = Array.from(row.children);
+		let values = [];
+		
+		// Extract values based on context and skip ID columns and action columns
+		switch(context) {
+			case 'customer':
+			// Skip ID (0) and Action (4), get Name(1), Email(2), Phone(3)
+			values = [cells[1].innerText, cells[2].innerText, cells[3].innerText];
+			break;
+			case 'employee':
+			// Skip ID (0) and Action (7), get Name(1), NIC(2), Email(3), Contact(4), Role(5), Salary(6)
+			values = [cells[1].innerText, cells[2].innerText, cells[3].innerText, 
+					cells[4].innerText, cells[5].innerText, cells[6].innerText.replace('$', '')];
+			break;
+			case 'part':
+			// Skip Part ID (0) and Action (8), get Name(1), Number(2), Brand(3), Model(4), Price(5), Desc(6), Stock(7)
+			values = [cells[1].innerText, cells[2].innerText, cells[3].innerText, 
+					cells[4].innerText, cells[5].innerText.replace('$', ''), cells[6].innerText, cells[7].innerText];
+			break;
+			case 'customer_delivery':
+			// Skip Action column, get Customer ID(0), Address(1), City(2), Zip(3)
+			values = [cells[0].innerText, cells[1].innerText, cells[2].innerText, cells[3].innerText];
+			break;
+			case 'customer_vehicle':
+			// Skip Vehicle ID (0) and Action (8), get Customer ID(1), Number(2), Brand(3), Model(4), Trim(5), Year(6), Desc(7)
+			values = [cells[1].innerText, cells[2].innerText, cells[3].innerText, 
+					cells[4].innerText, cells[5].innerText, cells[6].innerText, cells[7].innerText];
+			break;
+			case 'vehicle_repair':
+			// Skip ID (0) and Action (7), get Customer ID(1), Vehicle(2), Date(3), Desc(4), Price(5), Tech(6)
+			values = [cells[1].innerText, cells[2].innerText, cells[3].innerText, 
+					cells[4].innerText, cells[5].innerText.replace('$', ''), cells[6].innerText];
+			break;
+			case 'vehicle_service':
+			// Skip ID (0) and Action (7), get Customer ID(1), Vehicle(2), Date(3), Desc(4), Price(5), Tech(6)
+			values = [cells[1].innerText, cells[2].innerText, cells[3].innerText, 
+					cells[4].innerText, cells[5].innerText.replace('$', ''), cells[6].innerText];
+			break;
+			case 'repair_booking':
+			// Skip ID (0) and Action (5), get Slot(1), Customer(2), Date(3), Technician(4)
+			values = [cells[2].innerText, '', cells[1].innerText, cells[3].innerText, '', cells[4].innerText];
+			break;
+			case 'service_booking':
+			// Skip ID (0) and Action (5), get Slot(1), Customer(2), Date(3), Technician(4)
+			values = [cells[2].innerText, '', cells[1].innerText, cells[3].innerText, '', cells[4].innerText];
+			break;
+			case 'customer_chat':
+			// Skip ID (0) and Action (6), get Customer(1), Date(2), Desc(3), Employee(4), Status(5)
+			values = [cells[1].innerText, cells[4].innerText, cells[2].innerText, cells[3].innerText, cells[5].innerText];
+			break;
+			case 'order_item':
+			// Only get quantity(3) and unit_price(4) - these are the only editable fields
+			values = [cells[3].innerText, cells[4].innerText.replace('$', '')];
+			break;
+			default:
+			// Fallback: exclude first and last columns
+			values = Array.from(cells).slice(1, -1).map(td => {
 				let text = td.innerText.trim();
 				if (text.startsWith('$')) {
-					text = text.substring(1);
+				text = text.substring(1);
 				}
 				return text;
 			});
-			
-			// For order items, only extract the editable values (quantity and unit price)
-			let editableValues = values;
-			if (context === 'order_item') {
-				// Skip order number, customer, part name - only get quantity and unit price
-				editableValues = [values[3], values[4]]; // quantity and unit_price positions
-			}
-			
-			generateForm(fields[context] || [], editableValues);
-			document.getElementById('modalTitle').innerText = `Edit ${capitalize(context.replace('_', ' '))}`;
-			document.getElementById('formModal').classList.add('active');
+		}
+		
+		generateForm(fields[context] || [], values);
+		document.getElementById('modalTitle').innerText = `Edit ${capitalize(context.replace('_', ' '))}`;
+		document.getElementById('formModal').classList.add('active');
 		}
 
 		function generateForm(fieldNames, values = []) {

@@ -992,69 +992,90 @@
       }, 100);
     }
 
-    // Updated process payment function
+    // process payment function
     async function processPayment() {
-      try {
-        const addressData = {
-          address: document.getElementById('address').value,
-          city: document.getElementById('city').value,
-          zip_code: document.getElementById('zipCode').value
-        };
+        try {
+            const addressData = {
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                zip_code: document.getElementById('zipCode').value
+            };
 
-        // Validate required fields
-        if (!addressData.address || !addressData.city || !addressData.zip_code) {
-          alert('Please fill in all shipping address fields');
-          return;
-        }
-
-        // Create payment intent
-        const response = await fetch('/api/payment/intent', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': getCSRFToken()
-          },
-          body: JSON.stringify(addressData)
-        });
-
-        const intentData = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(intentData.error || 'Failed to create payment intent');
-        }
-
-        // Confirm payment with Stripe Elements
-        const { error, paymentIntent } = await stripe.confirmCardPayment(intentData.client_secret, {
-          payment_method: {
-            card: cardElement,
-            billing_details: {
-              name: user?.name || 'Customer',
-              email: user?.email || '',
+            // Validate required fields
+            if (!addressData.address || !addressData.city || !addressData.zip_code) {
+                alert('Please fill in all shipping address fields');
+                return;
             }
-          }
-        });
 
-        if (error) {
-          throw new Error(error.message);
+            // Create payment intent
+            const response = await fetch('/api/payment/intent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': getCSRFToken()
+                },
+                body: JSON.stringify(addressData)
+            });
+
+            const intentData = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(intentData.error || 'Failed to create payment intent');
+            }
+
+            // Confirm payment with Stripe Elements
+            const { error, paymentIntent } = await stripe.confirmCardPayment(intentData.client_secret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name: user?.name || 'Customer',
+                        email: user?.email || '',
+                    }
+                }
+            });
+
+            if (error) {
+                throw new Error(error.message);
+            }
+
+            if (paymentIntent.status === 'succeeded') {
+                // Confirm the order
+                const confirmResponse = await fetch('/api/payment/confirm', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        payment_intent_id: paymentIntent.id,
+                        address: addressData.address,
+                        city: addressData.city,
+                        zip_code: addressData.zip_code
+                    })
+                });
+
+                const orderResult = await confirmResponse.json();
+                
+                if (!confirmResponse.ok) {
+                    throw new Error(orderResult.error || 'Failed to confirm order');
+                }
+
+                // Success! Clear cart and show confirmation
+                cart = [];
+                updateCartBadge();
+                updateCartDisplay();
+                closeOffcanvas('checkoutOffcanvas');
+
+                alert(`Order placed successfully! Order number: ${orderResult.order.order_number}`);
+            }
+            
+        } catch (error) {
+            console.error('Payment failed:', error);
+            alert('Payment failed: ' + error.message);
+            throw error;
         }
-
-        if (paymentIntent.status === 'succeeded') {
-          // Confirm the order
-          // Success! Clear cart and show confirmation
-          cart = [];
-          updateCartBadge();
-          updateCartDisplay();
-          closeOffcanvas('checkoutOffcanvas');
-
-          alert(`Order placed successfully! Order number: ${orderResult.order.order_number}`);
-        }
-        
-      } catch (error) {
-        console.error('Payment failed:', error);
-        alert('Payment failed: ' + error.message);
-        throw error;
-      }
     }
 
     // Filter products
@@ -1208,6 +1229,17 @@
 
     // Event listeners
     document.addEventListener('DOMContentLoaded', function() {
+
+      // Make functions globally accessible
+      window.loadUserAddresses = loadUserAddresses;
+      window.showAddresses = showAddresses;
+      window.showAccountMain = showAccountMain;
+      window.addNewAddress = addNewAddress;
+      window.editAddress = editAddress;
+      window.deleteAddress = deleteAddress;
+      window.selectExistingAddress = selectExistingAddress;
+      window.showMyOrders = showMyOrders;
+      
       console.log('DOM loaded, initializing...');
       
       // Checkout form submission
@@ -1500,6 +1532,102 @@
           document.getElementById('zipCode').value = selectedOption.dataset.zip;
           selectedAddressId = parseInt(selectedOption.value);
         }
+      }
+
+      // Show My Orders
+      async function showMyOrders() {
+          try {
+              const response = await fetch('/api/orders', {
+                  headers: {
+                      'X-Requested-With': 'XMLHttpRequest',
+                      'X-CSRF-TOKEN': getCSRFToken()
+                  }
+              });
+              
+              if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              
+              const orders = await response.json();
+              console.log('Orders loaded:', orders);
+              
+              displayOrders(orders);
+              
+          } catch (error) {
+              console.error('Failed to load orders:', error);
+              alert('Failed to load orders: ' + error.message);
+          }
+      }
+
+      // Display orders
+      function displayOrders(orders) {
+          const ordersHTML = orders.length > 0 ? 
+              orders.map(order => `
+                  <div class="bg-gray-50 rounded-lg p-4 mb-3 border">
+                      <div class="flex justify-between items-start mb-2">
+                          <div>
+                              <h6 class="font-semibold">${order.order_number}</h6>
+                              <p class="text-sm text-gray-600">Status: ${order.status}</p>
+                              <p class="text-sm text-gray-600">Total: $${parseFloat(order.total_amount).toFixed(2)}</p>
+                          </div>
+                          <div class="text-right">
+                              <p class="text-xs text-gray-500">${new Date(order.created_at).toLocaleDateString()}</p>
+                              <span class="inline-block px-2 py-1 text-xs rounded ${getStatusClass(order.status)}">${order.status}</span>
+                          </div>
+                      </div>
+                      <div class="text-sm">
+                          <p class="text-gray-600">Items: ${order.order_items ? order.order_items.length : 0}</p>
+                          ${order.shipping_address ? `<p class="text-gray-600">Ship to: ${order.shipping_address.address}, ${order.shipping_address.city}</p>` : ''}
+                      </div>
+                  </div>
+              `).join('') :
+              '<p class="text-gray-500 text-center py-4">No orders found</p>';
+
+          // Update the account offcanvas to show orders
+          const accountOffcanvas = document.getElementById('accountOffcanvas');
+          const ordersSection = `
+              <div id="ordersView" style="display: none;">
+                  <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex justify-between items-center">
+                      <h5 class="text-lg font-semibold">
+                          <button onclick="showAccountMain()" class="mr-2 hover:text-gray-200">
+                              <i class="fas fa-arrow-left"></i>
+                          </button>
+                          My Orders
+                      </h5>
+                      <button class="text-white hover:text-gray-200" onclick="closeOffcanvas('accountOffcanvas')">
+                          <i class="fas fa-times"></i>
+                      </button>
+                  </div>
+                  <div class="p-4">
+                      <div id="ordersList">
+                          ${ordersHTML}
+                      </div>
+                  </div>
+              </div>
+          `;
+
+          // Add orders section if it doesn't exist
+          if (!document.getElementById('ordersView')) {
+              accountOffcanvas.insertAdjacentHTML('beforeend', ordersSection);
+          } else {
+              document.getElementById('ordersList').innerHTML = ordersHTML;
+          }
+
+          // Hide main account view and show orders
+          document.querySelector('#accountOffcanvas > div:nth-child(2)').style.display = 'none';
+          document.getElementById('ordersView').style.display = 'block';
+      }
+
+      // Get status class for styling
+      function getStatusClass(status) {
+          switch(status.toLowerCase()) {
+              case 'pending': return 'bg-yellow-100 text-yellow-800';
+              case 'processing': return 'bg-blue-100 text-blue-800';
+              case 'shipped': return 'bg-purple-100 text-purple-800';
+              case 'delivered': return 'bg-green-100 text-green-800';
+              case 'cancelled': return 'bg-red-100 text-red-800';
+              default: return 'bg-gray-100 text-gray-800';
+          }
       }
 
       // Initialize the app
