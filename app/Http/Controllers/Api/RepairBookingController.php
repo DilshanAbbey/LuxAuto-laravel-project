@@ -53,7 +53,7 @@ class RepairBookingController extends Controller
         }
 
         $booking = RepairBooking::create([
-            'idRepair_booking' => 'RB' . str_pad(RepairBooking::count() + 1, 4, '0', STR_PAD_LEFT),
+            'idRepair_booking' => $request->id,
             'customer_id' => $request->customer_id,
             'vehicle_id' => $request->vehicle_id,
             'slotNumber' => $request->slotNumber,

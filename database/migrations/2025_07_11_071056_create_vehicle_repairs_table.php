@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('technician');
             $table->string('vehicle_id');
             $table->string('customer_id');
-            $table->string('employee_id');
+            $table->string('employee_id')->nullable();
             $table->timestamps();
         });
     }

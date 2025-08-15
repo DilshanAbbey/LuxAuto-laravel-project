@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string('serviceDate');
             $table->string('description');
             $table->float('price');
-            $table->string('nextService');
+            $table->string('nextService')->nullable();
             $table->string('technician');
             $table->string('vehicle_id');
             $table->string('customer_id');
-            $table->string('employee_id');
+            $table->string('employee_id')->nullable();
             $table->timestamps();
         });
     }

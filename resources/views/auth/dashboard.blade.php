@@ -295,7 +295,7 @@
 		  <button onclick="showTab('productTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Product Management</button>
 		  <button onclick="showTab('jobTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Job Management</button>
 		  <button onclick="showTab('orderTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Order Management</button>
-		  <button onclick="showTab('orderItemsTab')" class="tab-button px-4 py-2 bg-white text-cyan-600 hover:bg-blue-600 hover:text-white rounded transition">Order Items Management</button>
+		  <button onclick="showTab('orderItemsTab')" class="tab-button px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white rounded transition">Order Items Management</button>
 		</div>
 
 		<!-- Customer Management Tab -->
@@ -462,7 +462,7 @@
 				<tr data-id="{{ $repairBook->id }}">
 					<td class="px-4 py-2">{{ $repairBook->idRepair_booking }}</td>
 					<td class="px-4 py-2">{{ $repairBook->slotNumber }}</td>
-					<td class="px-4 py-2">{{ $repairBook->customer->idCustomer }}</td>
+					<td class="px-4 py-2">{{ $repairBook->customer->id }}</td>
 					<td class="px-4 py-2">{{ $repairBook->date->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $repairBook->technician_in_charge }}</td>
 					<td class="px-4 py-2">
@@ -532,8 +532,8 @@
 				<tr data-id="{{ $serviceBook->id }}">
 					<td class="px-4 py-2">{{ $serviceBook->idService_booking }}</td>
 					<td class="px-4 py-2">{{ $serviceBook->slotNumber }}</td>
-					<td class="px-4 py-2">{{ $serviceBook->customer->idCustomer ?? 'N/A' }}</td>
-					<td class="px-4 py-2">{{ $serviceBook->date ? $serviceBook->date->format('Y-m-d') : 'N/A' }}</td>
+					<td class="px-4 py-2">{{ $serviceBook->customer->id}}</td>
+					<td class="px-4 py-2">{{ $serviceBook->date->format('Y-m-d')}}</td>
 					<td class="px-4 py-2">{{ $serviceBook->technician }}</td>
 					<td class="px-4 py-2">
 						<button onclick="editRow(this, 'service_booking')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
@@ -564,7 +564,7 @@
 			<tbody class="divide-y divide-gray-200" id="customerChatTable">
 				@foreach($data['customerChats'] as $chat)
 				<tr data-id="{{ $chat->id }}">
-					<td class="px-4 py-2">{{ $chat->idCustomer_Chat }}</td>
+					<td class="px-4 py-2">{{ $chat->id }}</td>
 					<td class="px-4 py-2">{{ $chat->customer->idCustomer }}</td>
 					<td class="px-4 py-2">{{ $chat->date->format('Y-m-d') }}</td>
 					<td class="px-4 py-2">{{ $chat->description }}</td>
@@ -755,45 +755,28 @@
 		</div>
 
 		<!-- Order Items Management Tab -->
-		<div id="orderItemsTab" class="tab-content bg-white p-6 rounded shadow">
-			<h2 class="text-2xl font-bold text-purple-600 mb-4">Order Items Management</h2>
-			<!-- No Add button - only view/edit/delete -->
-			<table class="min-w-full divide-y divide-gray-200">
-				<thead>
-					<tr class="bg-gray-100 text-left text-gray-600">
-						<th class="px-4 py-2">Order Number</th>
-						<th class="px-4 py-2">Customer</th>
-						<th class="px-4 py-2">Part Name</th>
-						<th class="px-4 py-2">Quantity</th>
-						<th class="px-4 py-2">Unit Price</th>
-						<th class="px-4 py-2">Total Price</th>
-						<th class="px-4 py-2">Action</th>
-					</tr>
-				</thead>
-				<tbody class="divide-y divide-gray-200" id="orderItemsTable">
-					@if(isset($data['orderItems']) && count($data['orderItems']) > 0)
-						@foreach($data['orderItems'] as $item)
-						<tr data-id="{{ $item->id }}">
-							<td class="px-4 py-2">{{ $item->order->order_number ?? 'N/A' }}</td>
-							<td class="px-4 py-2">{{ $item->order->user->name ?? 'N/A' }}</td>
-							<td class="px-4 py-2">{{ $item->part->partName ?? 'N/A' }}</td>
-							<td class="px-4 py-2">{{ $item->quantity }}</td>
-							<td class="px-4 py-2">${{ $item->unit_price }}</td>
-							<td class="px-4 py-2">${{ $item->total_price }}</td>
-							<td class="px-4 py-2">
-								<button onclick="editRow(this, 'order_item')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-								<button onclick="deleteRow(this, 'order_item')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
-							</td>
-						</tr>
-						@endforeach
-					@else
-						<tr>
-							<td colspan="7" class="px-4 py-2 text-center text-gray-500">No order items found</td>
-						</tr>
-					@endif
-				</tbody>
-			</table>
-		</div>
+		<tbody class="divide-y divide-gray-200" id="orderItemsTable">
+			@if(isset($data['orderItems']) && $data['orderItems']->count() > 0)
+				@foreach($data['orderItems'] as $item)
+				<tr data-id="{{ $item->id }}">
+					<td class="px-4 py-2">{{ $item->order->order_number ?? 'N/A' }}</td>
+					<td class="px-4 py-2">{{ $item->order->user->name ?? 'N/A' }}</td>
+					<td class="px-4 py-2">{{ $item->part->partName ?? 'N/A' }}</td>
+					<td class="px-4 py-2">{{ $item->quantity }}</td>
+					<td class="px-4 py-2">${{ $item->unit_price }}</td>
+					<td class="px-4 py-2">${{ $item->total_price }}</td>
+					<td class="px-4 py-2">
+						<button onclick="editRow(this, 'order_item')" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
+						<button onclick="deleteRow(this, 'order_item')" class="bg-red-500 text-white px-3 py-1 rounded ml-2">Delete</button>
+					</td>
+				</tr>
+				@endforeach
+			@else
+				<tr>
+					<td colspan="7" class="px-4 py-2 text-center text-gray-500">No order items found</td>
+				</tr>
+			@endif
+		</tbody>
 	  </main>
 	  
 	  <!-- Modal Template -->
@@ -976,7 +959,7 @@
 			employee: '/dashboard/employees',
 			part: '/dashboard/parts',
 			job: '/dashboard/tasks', // Point to tasks endpoint
-    		order: '/dashboard/orders'
+    		order: '/dashboard/orders',
 			order_item: '/dashboard/order-items'
 		};
 
@@ -992,7 +975,7 @@
 			employee: 'employeeTable',
 			part: 'productTable',
 			job: 'jobTable',
-			order: 'orderTable'
+			order: 'orderTable',
 			order_item: 'orderItemsTable'
 		};
 
@@ -1034,7 +1017,7 @@
 			
 			// Add active class to clicked button
 			event.target.classList.add('active');
-			
+
 			// Update active tab tracking
 			activeTab = id.replace('Tab', '');
 
@@ -1052,7 +1035,7 @@
 				'employee': 'employee',
 				'product': 'part',
 				'job': 'job',
-				'order': 'order'
+				'order': 'order',
 				'orderItems': 'order_item'
 			};
 			

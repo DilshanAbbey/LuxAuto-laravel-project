@@ -15,8 +15,7 @@ class RepairBooking extends Model
         'vehicle_id',
         'slotNumber',
         'date',
-        'time',
-        'technician_in_charge'
+        'technician'
     ];
 
     protected $casts = [

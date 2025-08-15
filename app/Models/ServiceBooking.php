@@ -15,7 +15,6 @@ class ServiceBooking extends Model
         'vehicle_id',
         'slotNumber',
         'date',
-        'time',
         'technician'
     ];
 

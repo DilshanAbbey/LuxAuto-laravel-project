@@ -39,6 +39,7 @@ class DashboardController extends Controller
             'repairBooking' => collect(),
             'serviceBooking' => collect(),
             'customerChats' => collect(),
+            'orderItems' => collect(),
         ];
 
         if ($user->isAdministrator()) {
@@ -80,7 +81,7 @@ class DashboardController extends Controller
             $technicianName = $user->name;
             
             // Combine repair and service bookings as "jobs" for technicians
-            $repairJobs = RepairBooking::where('technician_in_charge', $technicianName)
+            $repairJobs = RepairBooking::where('technician', $technicianName)
                 ->with(['customer', 'vehicle'])
                 ->get()
                 ->map(function($booking) {
@@ -125,6 +126,7 @@ class DashboardController extends Controller
                 'repairBooking' => collect(),
                 'serviceBooking' => collect(),
                 'customerChats' => collect(),
+                'orderItems' => collect(),
             ];
         }
         

@@ -53,7 +53,7 @@ class ServiceBookingController extends Controller
         }
 
         $booking = ServiceBooking::create([
-            'idService_booking' => 'SB' . str_pad(ServiceBooking::count() + 1, 4, '0', STR_PAD_LEFT),
+            'idService_booking' => $request->id,
             'customer_id' => $request->customer_id,
             'vehicle_id' => $request->vehicle_id,
             'slotNumber' => $request->slotNumber,

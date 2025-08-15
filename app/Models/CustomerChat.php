@@ -10,7 +10,7 @@ class CustomerChat extends Model
     use HasFactory;
 
     protected $fillable = [
-        'idCustomer_Chat',
+        'id',
         'customer_id',
         'employee_id',
         'date',

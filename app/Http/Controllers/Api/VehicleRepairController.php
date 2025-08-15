@@ -54,7 +54,7 @@ class VehicleRepairController extends Controller
         }
 
         $repair = VehicleRepair::create([
-            'idVehicle_Repair' => 'REP' . str_pad(VehicleRepair::count() + 1, 4, '0', STR_PAD_LEFT),
+            'idVehicle_Repair' => $request->id,
             'customer_id' => $request->customer_id,
             'vehicle_id' => $request->vehicle_id,
             'repairDate' => $request->repairDate,

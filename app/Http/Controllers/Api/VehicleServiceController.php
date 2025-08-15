@@ -54,7 +54,7 @@ class VehicleServiceController extends Controller
         }
 
         $service = VehicleService::create([
-            'idVehicle_Service' => 'REP' . str_pad(VehicleService::count() + 1, 4, '0', STR_PAD_LEFT),
+            'idVehicle_Service' => $request->id,
             'customer_id' => $request->customer_id,
             'vehicle_id' => $request->vehicle_id,
             'serviceDate' => $request->serviceDate,

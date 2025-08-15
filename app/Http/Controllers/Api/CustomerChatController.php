@@ -42,7 +42,7 @@ class CustomerChatController extends Controller
         }
 
         $chat = CustomerChat::create([
-            'idCustomer_Chat' => 'CHAT' . str_pad(CustomerChat::count() + 1, 4, '0', STR_PAD_LEFT),
+            'idCustomer_Chat' => $request->id,
             'customer_id' => $request->customer_id,
             'employee_id' => $request->employee_id,
             'date' => $request->date,

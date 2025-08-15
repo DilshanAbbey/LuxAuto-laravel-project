@@ -20,8 +20,8 @@ class VehicleService extends Model
     ];
 
     protected $casts = [
-        'service_date' => 'date',
-        'next_service_date' => 'date',
+        'serviceDate' => 'datetime',
+        'nextService' => 'datetime',
         'price' => 'decimal:2'
     ];
 

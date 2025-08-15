@@ -20,7 +20,7 @@ class VehicleRepair extends Model
     ];
 
     protected $casts = [
-        'repair_date' => 'date',
+        'repairDate' => 'datetime',
         'price' => 'decimal:2'
     ];
 
